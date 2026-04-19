@@ -4,17 +4,17 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-6">
       <section className="py-24 sm:py-32">
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">
+        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
           For Wealthsimple investors
         </p>
-        <h1 className="mt-6 font-serif text-6xl leading-[1.05] tracking-tight sm:text-7xl">
+        <h1 className="mt-5 font-serif text-[3.5rem] leading-[1.02] tracking-[-0.02em] sm:text-[5.5rem]">
           The portfolio breakdown
           <br />
           <span className="italic text-muted-foreground">
             Wealthsimple doesn&apos;t show you.
           </span>
         </h1>
-        <p className="mt-8 max-w-2xl text-xl leading-relaxed text-muted-foreground">
+        <p className="mt-7 max-w-xl text-lg leading-[1.65] text-muted-foreground">
           Drop in your Holdings Report and see your real exposure by sector,
           industry, geography, currency and account. ETFs are dissolved into
           their underlying sectors. Nothing leaves your browser.
@@ -27,7 +27,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="grid gap-12 border-t border-border/60 py-20 sm:grid-cols-3">
+      <section className="grid gap-10 border-t border-border/60 py-20 sm:grid-cols-3">
         <Feature title="Private by design">
           Parsing happens entirely in your browser. The server only ever sees
           public ticker symbols, never your positions.
@@ -54,8 +54,8 @@ function Feature({
 }) {
   return (
     <div>
-      <h3 className="font-serif text-2xl tracking-tight">{title}</h3>
-      <p className="mt-3 text-muted-foreground">{children}</p>
+      <h3 className="font-serif text-xl tracking-tight">{title}</h3>
+      <p className="mt-3 leading-relaxed text-muted-foreground">{children}</p>
     </div>
   );
 }

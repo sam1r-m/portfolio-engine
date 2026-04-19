@@ -12,6 +12,8 @@ body {
 
 body {
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv01";
+  text-rendering: optimizeLegibility;
 }
 
 a {
