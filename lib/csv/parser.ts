@@ -10,6 +10,31 @@ import {
 
 export interface ParsedHoldings {
   rows: HoldingRow[];
+  /** Pulled from the "As of ..." footer row WS sticks at the bottom. */
+  snapshotDate: Date | null;
+}
+
+const AS_OF_RE = /"?As of\s+([0-9]{4}-[0-9]{2}-[0-9]{2}[^"]*)"?\s*$/;
+
+function extractAsOfFooter(text: string): {
+  cleaned: string;
+  snapshotDate: Date | null;
+} {
+  const lines = text.split(/\r?\n/);
+  let snapshotDate: Date | null = null;
+  const kept: string[] = [];
+  for (const line of lines) {
+    const match = line.match(AS_OF_RE);
+    if (match) {
+      const parsed = new Date(match[1]);
+      if (!Number.isNaN(parsed.getTime())) {
+        snapshotDate = parsed;
+      }
+      continue;
+    }
+    kept.push(line);
+  }
+  return { cleaned: kept.join("\n"), snapshotDate };
 }
 
 export class CsvFormatError extends Error {
@@ -24,7 +49,8 @@ export class CsvFormatError extends Error {
  * &mdash; conversion to numbers happens later so we don't lose precision.
  */
 export function parseHoldingsCsv(text: string): ParsedHoldings {
-  const result = Papa.parse<Record<string, string>>(text, {
+  const { cleaned, snapshotDate } = extractAsOfFooter(text);
+  const result = Papa.parse<Record<string, string>>(cleaned, {
     header: true,
     skipEmptyLines: true,
   });
@@ -57,7 +83,7 @@ export function parseHoldingsCsv(text: string): ParsedHoldings {
     }
     rows.push(toHoldingRow(parsed.data));
   }
-  return { rows };
+  return { rows, snapshotDate };
 }
 
 function toHoldingRow(raw: RawHoldingsRow): HoldingRow {
