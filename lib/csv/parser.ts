@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { toDecimal } from "./money";
 import {
   HOLDINGS_HEADERS,
   type HoldingRow,
@@ -57,17 +58,17 @@ function toHoldingRow(raw: Record<string, string>): HoldingRow {
     mic: raw["MIC"] ?? "",
     name: raw["Name"] ?? "",
     securityType: (raw["Security Type"] ?? "EQUITY") as SecurityType,
-    quantity: raw["Quantity"] ?? "0",
+    quantity: toDecimal(raw["Quantity"]),
     positionDirection: (raw["Position Direction"] ?? "LONG") as PositionDirection,
-    marketPrice: raw["Market Price"] ?? "0",
+    marketPrice: toDecimal(raw["Market Price"]),
     marketPriceCurrency: raw["Market Price Currency"] ?? "",
-    bookValueCad: raw["Book Value (CAD)"] ?? "0",
+    bookValueCad: toDecimal(raw["Book Value (CAD)"]),
     bookValueCadCurrency: raw["Book Value Currency (CAD)"] ?? "CAD",
-    bookValueMarket: raw["Book Value (Market)"] ?? "0",
+    bookValueMarket: toDecimal(raw["Book Value (Market)"]),
     bookValueMarketCurrency: raw["Book Value Currency (Market)"] ?? "",
-    marketValue: raw["Market Value"] ?? "0",
+    marketValue: toDecimal(raw["Market Value"]),
     marketValueCurrency: raw["Market Value Currency"] ?? "",
-    marketUnrealizedReturns: raw["Market Unrealized Returns"] ?? "0",
+    marketUnrealizedReturns: toDecimal(raw["Market Unrealized Returns"]),
     marketUnrealizedReturnsCurrency:
       raw["Market Unrealized Returns Currency"] ?? "",
   };

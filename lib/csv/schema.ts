@@ -38,9 +38,11 @@ export type SecurityType =
 
 export type PositionDirection = "LONG" | "SHORT";
 
+import type { Money } from "./money";
+
 /**
- * One row of the parsed CSV. Money values stay as strings here so we don't
- * lose precision before decimal.js gets its hands on them.
+ * One row of the parsed CSV. Numeric fields are Decimal because WS emits
+ * 30-digit values that Number can't hold without rounding.
  */
 export interface HoldingRow {
   accountName: string;
@@ -52,16 +54,16 @@ export interface HoldingRow {
   mic: string;
   name: string;
   securityType: SecurityType;
-  quantity: string;
+  quantity: Money;
   positionDirection: PositionDirection;
-  marketPrice: string;
+  marketPrice: Money;
   marketPriceCurrency: string;
-  bookValueCad: string;
+  bookValueCad: Money;
   bookValueCadCurrency: string;
-  bookValueMarket: string;
+  bookValueMarket: Money;
   bookValueMarketCurrency: string;
-  marketValue: string;
+  marketValue: Money;
   marketValueCurrency: string;
-  marketUnrealizedReturns: string;
+  marketUnrealizedReturns: Money;
   marketUnrealizedReturnsCurrency: string;
 }
