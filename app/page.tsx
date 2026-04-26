@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Dropzone } from "@/components/import/dropzone";
 
 export default function Home() {
   return (
@@ -19,11 +19,8 @@ export default function Home() {
           industry, geography, currency and account. ETFs are dissolved into
           their underlying sectors. Nothing leaves your browser.
         </p>
-        <div className="mt-10 flex items-center gap-3">
-          <Button size="lg">Import holdings.csv</Button>
-          <span className="text-sm text-muted-foreground">
-            Or drop the file anywhere on the page
-          </span>
+        <div className="mt-10">
+          <Dropzone />
         </div>
       </section>
 
