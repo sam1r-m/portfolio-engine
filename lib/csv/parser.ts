@@ -81,6 +81,12 @@ export function parseHoldingsCsv(text: string): ParsedHoldings {
         `Row ${i + 2}: ${issue?.path.join(".") ?? "row"} &mdash; ${issue?.message ?? "invalid"}`,
       );
     }
+    if (parsed.data["Position Direction"] === "SHORT") {
+      throw new CsvFormatError(
+        `Row ${i + 2}: ${parsed.data["Symbol"]} is a SHORT position. ` +
+          `Portfolio Engine doesn't handle shorts yet &mdash; sorry!`,
+      );
+    }
     rows.push(toHoldingRow(parsed.data));
   }
   return { rows, snapshotDate };

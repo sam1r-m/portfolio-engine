@@ -36,4 +36,9 @@ describe("parseHoldingsCsv", () => {
     broken[0] = broken[0].replace(/,Symbol,/, ",");
     expect(() => parseHoldingsCsv(broken.join("\n"))).toThrow(CsvFormatError);
   });
+
+  it("rejects SHORT positions with a clear error", () => {
+    const withShort = FIXTURE.replace(/"LONG"/, '"SHORT"');
+    expect(() => parseHoldingsCsv(withShort)).toThrow(/SHORT position/);
+  });
 });
