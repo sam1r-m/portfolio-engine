@@ -3,20 +3,30 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { parseHoldingsCsv } from "@/lib/csv/parser";
+import { CsvFormatError, parseHoldingsCsv } from "@/lib/csv/parser";
 import { usePortfolioStore } from "@/lib/store/portfolio";
 
 export function Dropzone() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const setHoldings = usePortfolioStore((s) => s.setHoldings);
 
   async function handleFile(file: File) {
-    const text = await file.text();
-    const { rows, snapshotDate } = parseHoldingsCsv(text);
-    setHoldings(rows, snapshotDate, file.name);
-    router.push("/dashboard");
+    setError(null);
+    try {
+      const text = await file.text();
+      const { rows, snapshotDate } = parseHoldingsCsv(text);
+      setHoldings(rows, snapshotDate, file.name);
+      router.push("/dashboard");
+    } catch (err) {
+      if (err instanceof CsvFormatError) {
+        setError(err.message);
+      } else {
+        setError("Couldn't read that file. Is it really a CSV?");
+      }
+    }
   }
 
   return (
@@ -62,6 +72,17 @@ export function Dropzone() {
       >
         Choose file
       </Button>
+
+      {error ? (
+        <div className="mt-6 max-w-md rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
+          <p className="font-medium">That doesn&apos;t look like a Wealthsimple Holdings Report.</p>
+          <p className="mt-1 text-destructive/80">{error}</p>
+          <p className="mt-2 text-xs text-destructive/70">
+            Go to Wealthsimple &rarr; Documents &rarr; Holdings Report and
+            download the CSV from there.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
