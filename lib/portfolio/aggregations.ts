@@ -97,8 +97,28 @@ export function byIndustry(
   return bucketsToSlices(buckets, total);
 }
 
-export function byAssetClass(_rows: HoldingRow[]): BreakdownSlice[] {
-  return [];
+const ASSET_CLASS_LABEL: Record<string, string> = {
+  EQUITY: "Equity",
+  EXCHANGE_TRADED_FUND: "ETF",
+  MUTUAL_FUND: "Mutual Fund",
+  BOND: "Bond",
+  OPTION: "Option",
+  CASH: "Cash",
+};
+
+export function byAssetClass(
+  rows: HoldingRow[],
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): BreakdownSlice[] {
+  const buckets = new Map<string, Money>();
+  let total = toDecimal(0);
+  for (const row of rows) {
+    const value = marketValueCad(row, usdToCad);
+    total = total.plus(value);
+    const label = ASSET_CLASS_LABEL[row.securityType] ?? row.securityType;
+    addTo(buckets, label, value);
+  }
+  return bucketsToSlices(buckets, total);
 }
 
 export function byGeography(_rows: HoldingRow[]): BreakdownSlice[] {
