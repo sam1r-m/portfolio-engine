@@ -121,12 +121,42 @@ export function byAssetClass(
   return bucketsToSlices(buckets, total);
 }
 
-export function byGeography(_rows: HoldingRow[]): BreakdownSlice[] {
-  return [];
+const US_MICS = new Set(["XNAS", "XNYS", "BATS", "ARCX", "XASE", "IEXG"]);
+const CA_MICS = new Set(["XTSE", "XTSX", "XCNQ", "AEQL", "NEOE"]);
+
+function geographyFor(mic: string): string {
+  if (US_MICS.has(mic)) return "United States";
+  if (CA_MICS.has(mic)) return "Canada";
+  return "International";
 }
 
-export function byCurrency(_rows: HoldingRow[]): BreakdownSlice[] {
-  return [];
+export function byGeography(
+  rows: HoldingRow[],
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): BreakdownSlice[] {
+  const buckets = new Map<string, Money>();
+  let total = toDecimal(0);
+  for (const row of rows) {
+    const value = marketValueCad(row, usdToCad);
+    total = total.plus(value);
+    addTo(buckets, geographyFor(row.mic), value);
+  }
+  return bucketsToSlices(buckets, total);
+}
+
+export function byCurrency(
+  rows: HoldingRow[],
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): BreakdownSlice[] {
+  const buckets = new Map<string, Money>();
+  let total = toDecimal(0);
+  for (const row of rows) {
+    const value = marketValueCad(row, usdToCad);
+    total = total.plus(value);
+    const label = row.marketValueCurrency || "Other";
+    addTo(buckets, label, value);
+  }
+  return bucketsToSlices(buckets, total);
 }
 
 export function byAccount(_rows: HoldingRow[]): BreakdownSlice[] {
