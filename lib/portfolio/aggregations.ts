@@ -173,6 +173,41 @@ export function byAccount(
   return bucketsToSlices(buckets, total);
 }
 
+export interface PortfolioTotals {
+  marketValueCad: Money;
+  bookValueCad: Money;
+  unrealizedPlCad: Money;
+  unrealizedPlPercent: number;
+  holdingsCount: number;
+}
+
+export function portfolioTotals(
+  rows: HoldingRow[],
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): PortfolioTotals {
+  let marketValueCad = toDecimal(0);
+  let bookValueCad = toDecimal(0);
+  for (const row of rows) {
+    marketValueCad = marketValueCad.plus(marketValueCad_(row, usdToCad));
+    // bookValueCad is already CAD on the row, courtesy of WS
+    bookValueCad = bookValueCad.plus(row.bookValueCad);
+  }
+  const unrealizedPlCad = marketValueCad.minus(bookValueCad);
+  const unrealizedPlPercent = bookValueCad.isZero()
+    ? 0
+    : unrealizedPlCad.div(bookValueCad).times(100).toNumber();
+  return {
+    marketValueCad,
+    bookValueCad,
+    unrealizedPlCad,
+    unrealizedPlPercent,
+    holdingsCount: rows.length,
+  };
+}
+
+// renamed export so we can call it from above without a forward-ref dance
+const marketValueCad_ = marketValueCad;
+
 export interface TopHolding {
   symbol: string;
   name: string;
