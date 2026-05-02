@@ -159,6 +159,54 @@ export function byCurrency(
   return bucketsToSlices(buckets, total);
 }
 
-export function byAccount(_rows: HoldingRow[]): BreakdownSlice[] {
-  return [];
+export function byAccount(
+  rows: HoldingRow[],
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): BreakdownSlice[] {
+  const buckets = new Map<string, Money>();
+  let total = toDecimal(0);
+  for (const row of rows) {
+    const value = marketValueCad(row, usdToCad);
+    total = total.plus(value);
+    addTo(buckets, row.accountType || "Other", value);
+  }
+  return bucketsToSlices(buckets, total);
+}
+
+export interface TopHolding {
+  symbol: string;
+  name: string;
+  marketValueCad: Money;
+  percent: number;
+  unrealizedPlCad: Money;
+  sector?: string;
+}
+
+export function topHoldings(
+  rows: HoldingRow[],
+  enrichment: EnrichmentMap,
+  limit = 10,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): TopHolding[] {
+  const total = rows.reduce(
+    (acc, row) => acc.plus(marketValueCad(row, usdToCad)),
+    toDecimal(0),
+  );
+  const ranked = rows
+    .map<TopHolding>((row) => {
+      const value = marketValueCad(row, usdToCad);
+      const pl = row.marketUnrealizedReturnsCurrency === "USD"
+        ? row.marketUnrealizedReturns.times(usdToCad)
+        : row.marketUnrealizedReturns;
+      return {
+        symbol: row.symbol,
+        name: row.name,
+        marketValueCad: value,
+        percent: total.isZero() ? 0 : value.div(total).times(100).toNumber(),
+        unrealizedPlCad: pl,
+        sector: enrichment.get(enrichmentKey(row.symbol, row.mic))?.sector,
+      };
+    })
+    .sort((a, b) => b.marketValueCad.minus(a.marketValueCad).toNumber());
+  return ranked.slice(0, limit);
 }
