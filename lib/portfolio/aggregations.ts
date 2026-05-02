@@ -45,7 +45,20 @@ function bucketsToSlices(
       : value.div(total).times(100).toNumber();
     slices.push({ label, value, percent });
   }
-  return slices.sort((a, b) => b.value.minus(a.value).toNumber());
+  slices.sort((a, b) => b.value.minus(a.value).toNumber());
+  // Each percent gets rounded independently so the tooltip total drifts to
+  // like 99.9% or 100.1%. Push the rounding error onto the biggest slice
+  // so the displayed numbers always sum to exactly 100.
+  if (slices.length > 0) {
+    const sumPercent = slices.reduce((acc, s) => acc + s.percent, 0);
+    if (sumPercent > 0) {
+      slices[0] = {
+        ...slices[0],
+        percent: slices[0].percent + (100 - sumPercent),
+      };
+    }
+  }
+  return slices;
 }
 
 function addTo(buckets: Map<string, Money>, key: string, amount: Money) {

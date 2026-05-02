@@ -29,11 +29,10 @@ const enrichment: EnrichmentMap = new Map([
 ]);
 
 describe("portfolio aggregations", () => {
-  it("bucket percents on byAssetClass add up to ~100", () => {
+  it("bucket percents on byAssetClass add up to exactly 100", () => {
     const slices = byAssetClass(rows);
     const sum = slices.reduce((acc, s) => acc + s.percent, 0);
-    expect(sum).toBeGreaterThan(99.9);
-    expect(sum).toBeLessThan(100.1);
+    expect(sum).toBeCloseTo(100, 10);
   });
 
   it("byGeography splits into Canada / United States buckets", () => {
