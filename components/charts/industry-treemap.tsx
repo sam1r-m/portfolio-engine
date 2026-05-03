@@ -92,10 +92,14 @@ export function IndustryTreemap({ slices }: { slices: BreakdownSlice[] }) {
               borderRadius: 8,
               fontSize: 13,
             }}
-            formatter={(v: number, _name, item) => [
-              `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} (${item.payload?.percent?.toFixed(1) ?? "0"}%)`,
-              item.payload?.name ?? "",
-            ]}
+            formatter={(value, _name, item) => {
+              const v = Number(value ?? 0);
+              const pct = Number(item?.payload?.percent ?? 0);
+              return [
+                `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} (${pct.toFixed(1)}%)`,
+                String(item?.payload?.name ?? ""),
+              ];
+            }}
           />
         </Treemap>
       </ResponsiveContainer>
