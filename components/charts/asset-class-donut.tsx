@@ -3,6 +3,6 @@
 import { BreakdownDonut } from "./breakdown-donut";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
 
-export function SectorDonut({ slices }: { slices: BreakdownSlice[] }) {
+export function AssetClassDonut({ slices }: { slices: BreakdownSlice[] }) {
   return <BreakdownDonut slices={slices} />;
 }
