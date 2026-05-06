@@ -9,6 +9,7 @@ import { CurrencyDonut } from "@/components/charts/currency-donut";
 import { GeographyDonut } from "@/components/charts/geography-donut";
 import { IndustryTreemap } from "@/components/charts/industry-treemap";
 import { SectorDonut } from "@/components/charts/sector-donut";
+import { StatTiles } from "@/components/dashboard/stat-tiles";
 import { usePortfolioStore } from "@/lib/store/portfolio";
 import {
   byAccount,
@@ -17,11 +18,13 @@ import {
   byGeography,
   byIndustry,
   bySector,
+  portfolioTotals,
   type EnrichmentMap,
 } from "@/lib/portfolio/aggregations";
 
 export default function DashboardPage() {
   const holdings = usePortfolioStore((s) => s.holdings);
+  const snapshotDate = usePortfolioStore((s) => s.snapshotDate);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,9 +34,10 @@ export default function DashboardPage() {
   // sector enrichment gets filled in by the edge route in a later commit
   const enrichment: EnrichmentMap = useMemo(() => new Map(), []);
 
-  const slices = useMemo(() => {
+  const data = useMemo(() => {
     if (!holdings) return null;
     return {
+      totals: portfolioTotals(holdings),
       sector: bySector(holdings, enrichment),
       industry: byIndustry(holdings, enrichment),
       assetClass: byAssetClass(holdings),
@@ -43,30 +47,34 @@ export default function DashboardPage() {
     };
   }, [holdings, enrichment]);
 
-  if (!holdings || !slices) return null;
+  if (!holdings || !data) return null;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12">
       <h1 className="font-serif text-4xl tracking-tight">Your portfolio</h1>
 
+      <div className="mt-8">
+        <StatTiles totals={data.totals} snapshotDate={snapshotDate} />
+      </div>
+
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <ChartCard title="By sector">
-          <SectorDonut slices={slices.sector} />
+          <SectorDonut slices={data.sector} />
         </ChartCard>
         <ChartCard title="By industry">
-          <IndustryTreemap slices={slices.industry} />
+          <IndustryTreemap slices={data.industry} />
         </ChartCard>
         <ChartCard title="By asset class">
-          <AssetClassDonut slices={slices.assetClass} />
+          <AssetClassDonut slices={data.assetClass} />
         </ChartCard>
         <ChartCard title="By geography">
-          <GeographyDonut slices={slices.geography} />
+          <GeographyDonut slices={data.geography} />
         </ChartCard>
         <ChartCard title="By currency">
-          <CurrencyDonut slices={slices.currency} />
+          <CurrencyDonut slices={data.currency} />
         </ChartCard>
         <ChartCard title="By account">
-          <AccountTypeBar slices={slices.account} />
+          <AccountTypeBar slices={data.account} />
         </ChartCard>
       </div>
     </main>
