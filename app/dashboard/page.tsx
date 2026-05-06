@@ -10,6 +10,7 @@ import { GeographyDonut } from "@/components/charts/geography-donut";
 import { IndustryTreemap } from "@/components/charts/industry-treemap";
 import { SectorDonut } from "@/components/charts/sector-donut";
 import { StatTiles } from "@/components/dashboard/stat-tiles";
+import { HoldingsTable } from "@/components/holdings/holdings-table";
 import { usePortfolioStore } from "@/lib/store/portfolio";
 import {
   byAccount,
@@ -19,6 +20,7 @@ import {
   byIndustry,
   bySector,
   portfolioTotals,
+  topHoldings,
   type EnrichmentMap,
 } from "@/lib/portfolio/aggregations";
 
@@ -44,6 +46,7 @@ export default function DashboardPage() {
       geography: byGeography(holdings),
       currency: byCurrency(holdings),
       account: byAccount(holdings),
+      top: topHoldings(holdings, enrichment, 25),
     };
   }, [holdings, enrichment]);
 
@@ -76,6 +79,13 @@ export default function DashboardPage() {
         <ChartCard title="By account">
           <AccountTypeBar slices={data.account} />
         </ChartCard>
+      </div>
+
+      <div className="mt-10">
+        <h2 className="font-serif text-2xl tracking-tight">Top holdings</h2>
+        <div className="mt-4">
+          <HoldingsTable rows={data.top} />
+        </div>
       </div>
     </main>
   );
