@@ -1,6 +1,7 @@
 import { Decimal, toDecimal } from "@/lib/csv/money";
 import type { Money } from "@/lib/csv/money";
 import type { HoldingRow } from "@/lib/csv/schema";
+import { etfEntryFor, type EtfLookthrough } from "./etf-lookthrough";
 
 export interface BreakdownSlice {
   label: string;
@@ -68,6 +69,7 @@ function addTo(buckets: Map<string, Money>, key: string, amount: Money) {
 export function bySector(
   rows: HoldingRow[],
   enrichment: EnrichmentMap,
+  etfLookthrough?: EtfLookthrough,
   usdToCad: Decimal = USD_TO_CAD_FALLBACK,
 ): BreakdownSlice[] {
   const buckets = new Map<string, Money>();
@@ -75,11 +77,23 @@ export function bySector(
   for (const row of rows) {
     const value = marketValueCad(row, usdToCad);
     total = total.plus(value);
+
     if (row.securityType === "EXCHANGE_TRADED_FUND") {
-      // Real ETF look-through comes later. Until then they ride together.
+      // Dissolve ETFs into their underlying sectors when we have data for them
+      const entry = etfLookthrough
+        ? etfEntryFor(etfLookthrough, row.symbol, row.mic)
+        : undefined;
+      if (entry) {
+        for (const [sector, weight] of Object.entries(entry.sectorWeights)) {
+          const slice = value.times(weight).div(100);
+          addTo(buckets, sector, slice);
+        }
+        continue;
+      }
       addTo(buckets, "Diversified (ETF)", value);
       continue;
     }
+
     const sector =
       enrichment.get(enrichmentKey(row.symbol, row.mic))?.sector ??
       "Unclassified";

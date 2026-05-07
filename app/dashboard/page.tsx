@@ -27,6 +27,7 @@ import {
   topHoldings,
   type EnrichmentMap,
 } from "@/lib/portfolio/aggregations";
+import { loadEtfLookthrough } from "@/lib/portfolio/etf-lookthrough";
 
 export default function DashboardPage() {
   const holdings = usePortfolioStore((s) => s.holdings);
@@ -40,6 +41,7 @@ export default function DashboardPage() {
 
   // sector enrichment gets filled in by the edge route in a later commit
   const enrichment: EnrichmentMap = useMemo(() => new Map(), []);
+  const etfLookthrough = useMemo(() => loadEtfLookthrough(), []);
 
   const filtered = useMemo(() => {
     if (!holdings) return null;
@@ -51,7 +53,7 @@ export default function DashboardPage() {
     if (!filtered) return null;
     return {
       totals: portfolioTotals(filtered),
-      sector: bySector(filtered, enrichment),
+      sector: bySector(filtered, enrichment, etfLookthrough),
       industry: byIndustry(filtered, enrichment),
       assetClass: byAssetClass(filtered),
       geography: byGeography(filtered),
@@ -59,7 +61,7 @@ export default function DashboardPage() {
       account: byAccount(filtered),
       top: topHoldings(filtered, enrichment, 25),
     };
-  }, [filtered, enrichment]);
+  }, [filtered, enrichment, etfLookthrough]);
 
   if (!holdings || !filtered || !data) return null;
 
