@@ -28,6 +28,7 @@ import {
   type EnrichmentMap,
 } from "@/lib/portfolio/aggregations";
 import { loadEtfLookthrough } from "@/lib/portfolio/etf-lookthrough";
+import { useEnrichment } from "@/lib/portfolio/use-enrichment";
 
 export default function DashboardPage() {
   const holdings = usePortfolioStore((s) => s.holdings);
@@ -39,8 +40,7 @@ export default function DashboardPage() {
     if (!holdings) router.replace("/");
   }, [holdings, router]);
 
-  // sector enrichment gets filled in by the edge route in a later commit
-  const enrichment: EnrichmentMap = useMemo(() => new Map(), []);
+  const enrichment: EnrichmentMap = useEnrichment(holdings);
   const etfLookthrough = useMemo(() => loadEtfLookthrough(), []);
 
   const filtered = useMemo(() => {
