@@ -54,6 +54,32 @@ async function lookupFromYahoo(
   }
 }
 
+// FMP uses the same .TO suffix convention as Yahoo for TSX names.
+async function lookupFromFmp(
+  symbol: string,
+  mic: string,
+): Promise<Enrichment | null> {
+  const key = process.env.FMP_API_KEY;
+  if (!key) return null;
+  const fmpSymbol = yahooSymbol(symbol, mic);
+  try {
+    const res = await fetch(
+      `https://financialmodelingprep.com/api/v3/profile/${encodeURIComponent(fmpSymbol)}?apikey=${key}`,
+      { cache: "no-store" },
+    );
+    if (!res.ok) return null;
+    const json = (await res.json()) as Array<{ sector?: string; industry?: string }>;
+    const first = Array.isArray(json) ? json[0] : null;
+    if (!first) return null;
+    return {
+      sector: first.sector ?? "Unclassified",
+      industry: first.industry ?? "Unclassified",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req: Request) {
   let body: unknown;
   try {
@@ -81,8 +107,14 @@ export async function POST(req: Request) {
         return;
       }
       // 2) fall back to yahoo for anything we don't have curated
-      const remote = await lookupFromYahoo(symbol, mic);
-      if (remote) out[key] = remote;
+      const yahoo = await lookupFromYahoo(symbol, mic);
+      if (yahoo) {
+        out[key] = yahoo;
+        return;
+      }
+      // 3) last resort: FMP (if a key is configured)
+      const fmp = await lookupFromFmp(symbol, mic);
+      if (fmp) out[key] = fmp;
     }),
   );
 
