@@ -118,5 +118,15 @@ export async function POST(req: Request) {
     }),
   );
 
-  return NextResponse.json({ enrichment: out });
+  // Sector classifications barely change &mdash; cache at the edge for a day
+  // and serve stale-while-revalidate for a week. Saves yfinance calls big time.
+  return NextResponse.json(
+    { enrichment: out },
+    {
+      headers: {
+        "cache-control":
+          "public, s-maxage=86400, stale-while-revalidate=604800",
+      },
+    },
+  );
 }
