@@ -1,9 +1,13 @@
 import { Dropzone } from "@/components/import/dropzone";
+import { HeroRings } from "@/components/illustrations/hero-rings";
 
 export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-6">
-      <section className="py-24 sm:py-32">
+      <section className="relative py-24 sm:py-32">
+        <div className="pointer-events-none absolute right-0 top-12 hidden h-[340px] w-[340px] opacity-90 lg:block xl:right-[-40px]">
+          <HeroRings className="h-full w-full" />
+        </div>
         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
           For Wealthsimple investors
         </p>
