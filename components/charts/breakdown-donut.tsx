@@ -2,6 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
+import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
 
 // 5 brand chart colors cycled; if you have more than 5 buckets the later
 // ones loop around. Good enough for most breakdowns.
@@ -45,20 +46,8 @@ export function BreakdownDonut({
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{
-              background: "var(--popover)",
-              border: "1px solid var(--border)",
-              borderRadius: 8,
-              fontSize: 13,
-            }}
-            formatter={(value, _name, item) => {
-              const v = Number(value ?? 0);
-              const pct = Number(item?.payload?.percent ?? 0);
-              return [
-                `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} (${pct.toFixed(1)}%)`,
-                String(item?.payload?.name ?? ""),
-              ];
-            }}
+            contentStyle={TOOLTIP_CONTENT_STYLE}
+            formatter={moneyTooltipFormatter}
           />
         </PieChart>
       </ResponsiveContainer>

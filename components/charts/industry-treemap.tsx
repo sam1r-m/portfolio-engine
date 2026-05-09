@@ -2,6 +2,7 @@
 
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
+import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
 
 // Same 5-color rotation as the donut for visual consistency.
 const PALETTE = [
@@ -86,20 +87,8 @@ export function IndustryTreemap({ slices }: { slices: BreakdownSlice[] }) {
           content={<TreemapNode {...({} as NodeProps)} />}
         >
           <Tooltip
-            contentStyle={{
-              background: "var(--popover)",
-              border: "1px solid var(--border)",
-              borderRadius: 8,
-              fontSize: 13,
-            }}
-            formatter={(value, _name, item) => {
-              const v = Number(value ?? 0);
-              const pct = Number(item?.payload?.percent ?? 0);
-              return [
-                `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })} (${pct.toFixed(1)}%)`,
-                String(item?.payload?.name ?? ""),
-              ];
-            }}
+            contentStyle={TOOLTIP_CONTENT_STYLE}
+            formatter={moneyTooltipFormatter}
           />
         </Treemap>
       </ResponsiveContainer>
