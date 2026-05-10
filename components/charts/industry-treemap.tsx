@@ -84,7 +84,7 @@ export function IndustryTreemap({ slices }: { slices: BreakdownSlice[] }) {
           dataKey="value"
           aspectRatio={4 / 3}
           stroke="var(--background)"
-          content={<TreemapNode {...({} as NodeProps)} />}
+          content={(props) => <TreemapNode {...(props as NodeProps)} />}
         >
           <Tooltip
             contentStyle={TOOLTIP_CONTENT_STYLE}

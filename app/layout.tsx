@@ -17,9 +17,27 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio Engine",
+  metadataBase: new URL("https://portfolio.samirmd.com"),
+  title: {
+    default: "Portfolio Engine",
+    template: "%s · Portfolio Engine",
+  },
   description:
-    "Sector, industry and geography breakdowns for your Wealthsimple portfolio.",
+    "Sector, industry, geography, currency and account-type breakdowns for your Wealthsimple portfolio. ETFs dissolved. Nothing leaves your browser.",
+  openGraph: {
+    title: "Portfolio Engine",
+    description:
+      "The portfolio breakdown Wealthsimple doesn't show you. Sector and industry breakdowns from your Holdings Report. Runs entirely in your browser.",
+    url: "https://portfolio.samirmd.com",
+    siteName: "Portfolio Engine",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Portfolio Engine",
+    description:
+      "Sector, industry and geography breakdowns for your Wealthsimple portfolio.",
+  },
 };
 
 export default function RootLayout({

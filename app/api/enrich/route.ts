@@ -3,9 +3,10 @@ import { z } from "zod";
 import YahooFinance from "yahoo-finance2";
 import tickers from "@/lib/data/tickers.json";
 
-// yahoo-finance2 v3+ supports edge runtimes (fetch-based). This route only
-// ever sees public ticker symbols, never user positions or values.
-export const runtime = "edge";
+// yahoo-finance2 pulls in Node fs under the hood, so Edge won't fly here.
+// Node serverless is fine — this route only ever sees public ticker symbols,
+// never user positions or values.
+export const runtime = "nodejs";
 
 const TickerSchema = z.object({
   symbol: z.string().min(1).max(12),
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
   await Promise.all(
     parsed.data.tickers.map(async ({ symbol, mic }) => {
       const key = enrichmentKey(symbol, mic);
-      // 1) check the bundled curated map first &mdash; no network needed
+      // 1) check the bundled curated map first — no network needed
       const local = BUNDLED[key];
       if (local) {
         out[key] = local;
@@ -118,8 +119,8 @@ export async function POST(req: Request) {
     }),
   );
 
-  // Sector classifications barely change &mdash; cache at the edge for a day
-  // and serve stale-while-revalidate for a week. Saves yfinance calls big time.
+  // Sector classifications barely change — cache for a day at the CDN /
+  // stale-while-revalidate for a week. Saves Yahoo round-trips.
   return NextResponse.json(
     { enrichment: out },
     {

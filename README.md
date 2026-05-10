@@ -40,7 +40,7 @@ application.
   public ticker symbols (e.g. `[{symbol: "AAPL", mic: "XNAS"}]`) and
   receives back `{sector, industry}` for each. No values, no quantities,
   no account info ever leaves the browser.
-- The enrich route is a Vercel Edge Function that consults a bundled
+- The enrich route is a Vercel Node serverless function that consults a bundled
   ticker map first, then falls back to Yahoo Finance (and optionally
   Financial Modeling Prep). Responses are cached at the edge for 24h.
 

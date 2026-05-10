@@ -27,8 +27,9 @@ export default function PrivacyPage() {
 
         <Section title="The only outbound request is to /api/enrich.">
           To label your equities by sector and industry, the dashboard
-          posts a list of <em>public ticker symbols</em> to a Vercel Edge
-          Function (e.g. <code>{"{symbol: \"AAPL\", mic: \"XNAS\"}"}</code>).
+          posts a list of <em>public ticker symbols</em> to a Vercel Node
+          serverless route (e.g.{" "}
+          <code>{"{symbol: \"AAPL\", mic: \"XNAS\"}"}</code>).
           The response is the corresponding sector and industry strings.
           That&apos;s it. No quantities, no values, no account types, no
           unrealized P/L, no snapshot date, no IP-derived identity, no
