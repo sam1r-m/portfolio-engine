@@ -3,64 +3,57 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy · Portfolio Engine",
   description:
-    "What Portfolio Engine sends to the server (and what it absolutely doesn't).",
+    "What leaves your browser when you use Portfolio Engine, and what does not.",
 };
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-20">
-      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+    <main className="mx-auto max-w-3xl px-6 py-20 sm:px-8">
+      <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
         Privacy
       </p>
-      <h1 className="mt-4 font-serif text-5xl tracking-tight">
-        Your holdings stay in your browser.
+      <h1 className="mt-4 font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)] sm:text-5xl">
+        Your holdings stay in the browser.
       </h1>
 
-      <div className="mt-10 space-y-8 text-lg leading-relaxed text-muted-foreground">
-        <Section title="The CSV never leaves your machine.">
-          When you drop your Holdings Report on the upload box, it&apos;s
-          parsed entirely in your browser. The file is read with the
-          FileReader API, parsed in memory with PapaParse, and held in a
-          client-side Zustand store. The page itself is a static asset.
-          Nothing in that path makes a network call out.
+      <div className="mt-10 space-y-10 text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <Section title="The csv never leaves your machine.">
+          When you drop the report on the upload area, it is parsed in the
+          tab with the FileReader api, PapaParse, and a zod schema. Rows sit
+          in a zustand store. That path never opens a network request.
         </Section>
 
-        <Section title="The only outbound request is to /api/enrich.">
-          To label your equities by sector and industry, the dashboard
-          posts a list of <em>public ticker symbols</em> to a Vercel Node
-          serverless route (e.g.{" "}
-          <code>{"{symbol: \"AAPL\", mic: \"XNAS\"}"}</code>).
-          The response is the corresponding sector and industry strings.
-          That&apos;s it. No quantities, no values, no account types, no
-          unrealized P/L, no snapshot date, no IP-derived identity, no
-          authentication cookie.
+        <Section title="The only server call is /api/enrich.">
+          To print sector and industry on stocks, the client posts a list of
+          public ticker symbols to a small node route on Vercel (example{" "}
+          <code>{"{ symbol: \"AAPL\", mic: \"XNAS\" }"}</code>
+          ). The response is plain text labels. No quantities, no balances, no
+          account type, no p/l, no snapshot date.
         </Section>
 
-        <Section title="No accounts, no tracking, no cookies.">
-          There&apos;s no signup. There&apos;s no analytics script.
-          There&apos;s no third-party fonts hotlink that could carry an
-          identifier. The only thing in localStorage is whatever React /
-          Next.js writes for hot reloading during dev &mdash; nothing
-          related to your portfolio.
+        <Section title="No accounts or analytics.">
+          No login, no tracking snippet, no third party font host that could
+          fingerprint you. localStorage only has whatever Next dev mode writes
+          during hot reload, nothing tied to your portfolio.
         </Section>
 
-        <Section title="Open source.">
-          The full source is on{" "}
+        <Section title="Source is public.">
+          Code lives on{" "}
           <a
             href="https://github.com/sam1r-m/portfolio-engine"
             target="_blank"
             rel="noreferrer"
-            className="text-foreground underline underline-offset-4"
+            className="font-medium text-[var(--ws-charcoal)] underline underline-offset-4"
           >
             GitHub
           </a>
-          . The enrich route is ~80 lines of TypeScript; you can read
-          exactly what gets sent in <code>app/api/enrich/route.ts</code>.
+          . The enrich handler is a single file if you want to read the exact
+          request shape.
         </Section>
 
-        <Section title="Reload = wipe.">
-          The store is in-memory only. Close the tab or hit refresh and
-          your holdings are gone. To re-analyze, just drop the CSV again.
+        <Section title="Reload clears the store.">
+          Everything is in memory. Close the tab or refresh and the rows are
+          gone. Import the csv again whenever you want a fresh pass.
         </Section>
       </div>
     </main>
@@ -76,7 +69,7 @@ function Section({
 }) {
   return (
     <section>
-      <h2 className="font-serif text-2xl tracking-tight text-foreground">
+      <h2 className="font-serif text-xl font-semibold tracking-tight text-[var(--ws-black)] sm:text-2xl">
         {title}
       </h2>
       <p className="mt-3">{children}</p>

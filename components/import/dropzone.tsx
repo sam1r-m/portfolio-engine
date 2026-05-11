@@ -2,9 +2,11 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
 import { Button } from "@/components/ui/button";
 import { CsvFormatError, parseHoldingsCsv } from "@/lib/csv/parser";
 import { usePortfolioStore } from "@/lib/store/portfolio";
+import { cn } from "@/lib/utils";
 
 export function Dropzone() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -24,7 +26,7 @@ export function Dropzone() {
       if (err instanceof CsvFormatError) {
         setError(err.message);
       } else {
-        setError("Couldn't read that file. Is it really a CSV?");
+        setError("Could not read that file. Try a real csv export.");
       }
     }
   }
@@ -42,17 +44,18 @@ export function Dropzone() {
         const file = e.dataTransfer.files?.[0];
         if (file) await handleFile(file);
       }}
-      className={`flex flex-col items-center justify-center rounded-xl border border-dashed p-14 text-center transition-colors ${
+      className={cn(
+        "pressable-surface flex flex-col items-center justify-center rounded-xl border border-dashed border-border/90 bg-card/90 p-12 text-center sm:p-14",
         dragging
-          ? "border-foreground bg-secondary/60"
-          : "border-border/80 hover:bg-secondary/30"
-      }`}
+          ? "border-[var(--ws-charcoal)] bg-secondary/70"
+          : "hover:border-[var(--ws-charcoal)]/40",
+      )}
     >
-      <p className="font-serif text-xl tracking-tight">
-        Drop your holdings.csv here
+      <p className="font-serif text-lg font-semibold tracking-tight text-[var(--ws-black)] sm:text-xl">
+        Drop your holdings csv here
       </p>
       <p className="mt-2 text-sm text-muted-foreground">
-        or click to pick a file
+        or click below to pick a file
       </p>
       <input
         ref={inputRef}
@@ -67,19 +70,22 @@ export function Dropzone() {
       <Button
         type="button"
         variant="outline"
-        className="mt-6"
+        className="pressable-surface mt-6 border-[var(--ws-charcoal)]/25 bg-background font-medium text-[var(--ws-charcoal)] hover:bg-secondary"
         onClick={() => inputRef.current?.click()}
       >
         Choose file
       </Button>
 
       {error ? (
-        <div className="mt-6 max-w-md rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
-          <p className="font-medium">That doesn&apos;t look like a Wealthsimple Holdings Report.</p>
-          <p className="mt-1 text-destructive/80">{error}</p>
-          <p className="mt-2 text-xs text-destructive/70">
-            Go to Wealthsimple &rarr; Documents &rarr; Holdings Report and
-            download the CSV from there.
+        <div className="mt-6 max-w-md rounded-lg border border-destructive/35 bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
+          <p className="font-medium">
+            That does not look like a holdings export from{" "}
+            <WealthsimpleWord />.
+          </p>
+          <p className="mt-1 text-destructive/85">{error}</p>
+          <p className="mt-2 text-xs text-destructive/75">
+            In <WealthsimpleWord />, open Documents, then Holdings Report, and
+            download the csv from there.
           </p>
         </div>
       ) : null}

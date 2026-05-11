@@ -1,66 +1,68 @@
+import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
 import { Dropzone } from "@/components/import/dropzone";
-import { HeroRings } from "@/components/illustrations/hero-rings";
+import { InsetRule } from "@/components/layout/inset-rule";
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-5xl px-6">
-      <section className="relative py-24 sm:py-32">
-        <div className="pointer-events-none absolute right-0 top-12 hidden h-[340px] w-[340px] opacity-90 lg:block xl:right-[-40px]">
-          <HeroRings className="h-full w-full" />
-        </div>
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          For Wealthsimple investors
-        </p>
-        <h1 className="mt-5 font-serif text-[3.5rem] leading-[1.02] tracking-[-0.02em] sm:text-[5.5rem]">
-          The portfolio breakdown
-          <br />
-          <span className="italic text-muted-foreground">
-            Wealthsimple doesn&apos;t show you.
-          </span>
+    <main className="mx-auto max-w-6xl px-6 sm:px-8">
+      <section className="py-20 sm:py-28">
+        <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)] sm:text-5xl md:text-6xl">
+          Portfolio Engine
         </h1>
-        <p className="mt-7 max-w-xl text-lg leading-[1.65] text-muted-foreground">
-          Drop in your Holdings Report and see your real exposure by sector,
-          industry, geography, currency and account. ETFs are dissolved into
-          their underlying sectors. No account, no upload &mdash; nothing ever
-          leaves your browser.
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Side project I wrote for my own holdings export from{" "}
+          <WealthsimpleWord />. You grab the official report csv, drop it
+          here, and the tables and charts run entirely in the browser. A
+          small api route only ever sees public ticker keys when it needs
+          sector or industry text. Your quantities and balances never get
+          sent up. A handful of etfs I mapped manually split into sector
+          slices so the donut is not one giant etf block.
         </p>
-        <div className="mt-10">
+        <div className="mt-10 max-w-xl">
           <Dropzone />
         </div>
       </section>
 
-      <section className="grid gap-10 border-t border-border/60 py-20 sm:grid-cols-3">
-        <Feature title="Private by design">
-          Parsing happens entirely in your browser. The server only ever sees
-          public ticker symbols, never your positions or P/L.
+      <InsetRule />
+
+      <section className="grid gap-8 py-16 sm:grid-cols-3 sm:gap-6">
+        <Feature title="Local parse">
+          The csv never hits an upload url. PapaParse and zod run in the tab,
+          then zustand holds the rows until you refresh.
         </Feature>
-        <Feature title="ETF look-through">
-          VEQT, XEQT, VFV and friends get dissolved into their underlying
-          sectors so the chart reflects your actual exposure, not just &ldquo;ETF.&rdquo;
+        <Feature title="Etf map">
+          Static json weights for funds I actually cared about (veqt style
+          blends, broad us names, a few themes). Your market value gets
+          spread across those sector buckets for the chart.
         </Feature>
-        <Feature title="Built for the WS export">
-          Reads the official Holdings Report CSV exactly as Wealthsimple emits
-          it. No copy-paste, no manual entry, no broker connection.
+        <Feature title="Built on the export">
+          Matches the columns in the{" "}
+          <WealthsimpleWord /> holdings report. No broker link, no copy paste
+          grid.
         </Feature>
       </section>
 
-      <section className="border-t border-border/60 py-20">
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          Getting the file
-        </p>
-        <h2 className="mt-4 font-serif text-3xl tracking-tight sm:text-4xl">
-          Three clicks inside Wealthsimple.
+      <InsetRule />
+
+      <section className="py-16">
+        <h2 className="font-serif text-2xl font-semibold tracking-tight text-[var(--ws-black)] sm:text-3xl">
+          Where to get the csv
         </h2>
-        <ol className="mt-8 grid gap-6 sm:grid-cols-3">
-          <Step n={1} label="Open Wealthsimple">
-            Log in on web or open the app and head to your profile menu.
+        <ol className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-6">
+          <Step n={1} title="Log in">
+            Open <WealthsimpleWord /> on web or the app and go to your
+            profile menu.
           </Step>
-          <Step n={2} label="Documents → Holdings Report">
-            Pick the account (or &ldquo;All accounts&rdquo;) and the snapshot date.
-          </Step>
-          <Step n={3} label="Download the CSV">
-            Drop it on the box above. Everything runs locally from there.
-          </Step>
+          <Step
+            n={2}
+            title="Documents, then Holdings Report"
+            body="Pick the account or all accounts and the snapshot date you want."
+          />
+          <Step
+            n={3}
+            title="Download"
+            body="Save the csv, then drop it in the box above. That is the whole input."
+          />
         </ol>
       </section>
     </main>
@@ -75,30 +77,38 @@ function Feature({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <h3 className="font-serif text-xl tracking-tight">{title}</h3>
-      <p className="mt-3 leading-relaxed text-muted-foreground">{children}</p>
+    <div className="pressable-surface rounded-xl border border-border/70 bg-card p-6">
+      <h3 className="font-serif text-lg font-semibold tracking-tight text-[var(--ws-black)]">
+        {title}
+      </h3>
+      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        {children}
+      </p>
     </div>
   );
 }
 
 function Step({
   n,
-  label,
+  title,
   children,
+  body,
 }: {
   n: number;
-  label: string;
-  children: React.ReactNode;
+  title: string;
+  children?: React.ReactNode;
+  body?: string;
 }) {
   return (
     <li className="list-none">
-      <p className="font-serif text-2xl tracking-tight text-muted-foreground">
+      <p className="font-mono text-xs font-medium text-muted-foreground">
         {String(n).padStart(2, "0")}
       </p>
-      <h3 className="mt-2 font-serif text-lg tracking-tight">{label}</h3>
+      <h3 className="mt-2 font-serif text-lg font-semibold tracking-tight text-[var(--ws-black)]">
+        {title}
+      </h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {children}
+        {body ?? children}
       </p>
     </li>
   );

@@ -66,9 +66,11 @@ export default function DashboardPage() {
   if (!holdings || !filtered || !data) return null;
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="font-serif text-4xl tracking-tight">Your portfolio</h1>
+    <main className="mx-auto max-w-6xl px-6 py-12 sm:px-8">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)]">
+          Your portfolio
+        </h1>
         <AccountFilter
           rows={holdings}
           value={accountFilter}
@@ -102,7 +104,9 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-10">
-        <h2 className="font-serif text-2xl tracking-tight">Top holdings</h2>
+        <h2 className="font-serif text-2xl font-semibold tracking-tight text-[var(--ws-black)]">
+          Top holdings
+        </h2>
         <div className="mt-4">
           <HoldingsTable rows={data.top} />
         </div>
@@ -119,9 +123,9 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card>
+    <Card className="pressable-surface border border-border/70 ring-0">
       <CardHeader>
-        <CardTitle className="font-serif text-xl tracking-tight">
+        <CardTitle className="font-serif text-xl font-semibold tracking-tight text-[var(--ws-black)]">
           {title}
         </CardTitle>
       </CardHeader>

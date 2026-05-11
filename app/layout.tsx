@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Source_Serif_4 } from "next/font/google";
+import { Libre_Caslon_Text, Montserrat } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
-const inter = Inter({
+const montserrat = Montserrat({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-const serif = Source_Serif_4({
+const libreCaslon = Libre_Caslon_Text({
   variable: "--font-serif",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -23,11 +24,11 @@ export const metadata: Metadata = {
     template: "%s · Portfolio Engine",
   },
   description:
-    "Sector, industry, geography, currency and account-type breakdowns for your Wealthsimple portfolio. ETFs dissolved. Nothing leaves your browser.",
+    "Holdings report charts in the browser. Sector and industry breakdowns for Wealthsimple exports.",
   openGraph: {
     title: "Portfolio Engine",
     description:
-      "The portfolio breakdown Wealthsimple doesn't show you. Sector and industry breakdowns from your Holdings Report. Runs entirely in your browser.",
+      "Parse your Wealthsimple holdings csv locally. Charts for sector, industry, geography, and more.",
     url: "https://portfolio.samirmd.com",
     siteName: "Portfolio Engine",
     type: "website",
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Portfolio Engine",
     description:
-      "Sector, industry and geography breakdowns for your Wealthsimple portfolio.",
+      "Local first portfolio breakdowns from a Wealthsimple holdings export.",
   },
 };
 
@@ -46,8 +47,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
-      <body className="flex min-h-screen flex-col font-sans">
+    <html lang="en" className={`${montserrat.variable} ${libreCaslon.variable}`}>
+      <body className="flex min-h-screen flex-col font-sans antialiased">
         <Header />
         <div className="flex-1">{children}</div>
         <Footer />

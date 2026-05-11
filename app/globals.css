@@ -11,7 +11,6 @@ body {
 }
 
 body {
-  -webkit-font-smoothing: antialiased;
   font-feature-settings: "ss01", "cv01";
   text-rendering: optimizeLegibility;
 }
@@ -66,40 +65,41 @@ a {
 }
 
 :root {
-  /* WS-adjacent: warm cream background, Dune-ish foreground */
-  --background: oklch(0.972 0.008 85);
-  --foreground: oklch(0.27 0.005 60);
-  --card: oklch(0.99 0.005 85);
-  --card-foreground: oklch(0.27 0.005 60);
-  --popover: oklch(0.99 0.005 85);
-  --popover-foreground: oklch(0.27 0.005 60);
-  --primary: oklch(0.27 0.005 60);
-  --primary-foreground: oklch(0.972 0.008 85);
-  --secondary: oklch(0.93 0.01 85);
-  --secondary-foreground: oklch(0.27 0.005 60);
-  --muted: oklch(0.93 0.01 85);
-  --muted-foreground: oklch(0.48 0.012 65);
-  --accent: oklch(0.78 0.12 80);
-  --accent-foreground: oklch(0.27 0.005 60);
+  /* WS adjacent: warm paper, charcoal text (#32302f), near black for emphasis */
+  --ws-charcoal: #32302f;
+  --ws-black: #0d0d0c;
+  --background: #f7f4ee;
+  --foreground: var(--ws-charcoal);
+  --card: #fdfbf7;
+  --card-foreground: var(--ws-charcoal);
+  --popover: #fdfbf7;
+  --popover-foreground: var(--ws-charcoal);
+  --primary: var(--ws-black);
+  --primary-foreground: #f7f4ee;
+  --secondary: #ebe6dc;
+  --secondary-foreground: var(--ws-charcoal);
+  --muted: #ebe6dc;
+  --muted-foreground: #5c5955;
+  --accent: #e3d9c8;
+  --accent-foreground: var(--ws-charcoal);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0.008 85);
-  --input: oklch(0.88 0.008 85);
-  --ring: oklch(0.78 0.12 80);
-  /* Chart palette: warm earth tones, deliberately not fintech-neon */
-  --chart-1: oklch(0.78 0.12 80);   /* mustard */
-  --chart-2: oklch(0.62 0.13 30);   /* terracotta */
-  --chart-3: oklch(0.58 0.05 200);  /* muted teal */
-  --chart-4: oklch(0.68 0.06 65);   /* warm sand */
-  --chart-5: oklch(0.42 0.008 60);  /* deep dune */
+  --border: color-mix(in srgb, var(--ws-charcoal) 12%, transparent);
+  --input: color-mix(in srgb, var(--ws-charcoal) 14%, transparent);
+  --ring: color-mix(in srgb, var(--ws-charcoal) 35%, transparent);
+  --chart-1: oklch(0.78 0.12 80);
+  --chart-2: oklch(0.62 0.13 30);
+  --chart-3: oklch(0.58 0.05 200);
+  --chart-4: oklch(0.68 0.06 65);
+  --chart-5: oklch(0.42 0.008 60);
   --radius: 0.625rem;
-  --sidebar: oklch(0.99 0.005 85);
-  --sidebar-foreground: oklch(0.27 0.005 60);
-  --sidebar-primary: oklch(0.27 0.005 60);
-  --sidebar-primary-foreground: oklch(0.972 0.008 85);
-  --sidebar-accent: oklch(0.93 0.01 85);
-  --sidebar-accent-foreground: oklch(0.27 0.005 60);
-  --sidebar-border: oklch(0.88 0.008 85);
-  --sidebar-ring: oklch(0.78 0.12 80);
+  --sidebar: #fdfbf7;
+  --sidebar-foreground: var(--ws-charcoal);
+  --sidebar-primary: var(--ws-black);
+  --sidebar-primary-foreground: #f7f4ee;
+  --sidebar-accent: #ebe6dc;
+  --sidebar-accent-foreground: var(--ws-charcoal);
+  --sidebar-border: color-mix(in srgb, var(--ws-charcoal) 12%, transparent);
+  --sidebar-ring: color-mix(in srgb, var(--ws-charcoal) 35%, transparent);
 }
 
 .dark {
@@ -134,6 +134,40 @@ a {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Soft lift for dropzones, cards, primary controls */
+.pressable-surface {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.55) inset,
+    0 1px 2px rgb(20 20 19 / 0.05),
+    0 8px 22px -10px rgb(20 20 19 / 0.12);
+}
+
+.pressable-surface:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.55) inset,
+    0 2px 4px rgb(20 20 19 / 0.07),
+    0 14px 32px -12px rgb(20 20 19 / 0.16);
+}
+
+.pressable-surface:active {
+  transform: translateY(0);
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.45) inset,
+    0 1px 2px rgb(20 20 19 / 0.06);
+}
+
+.nav-lift {
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.nav-lift:hover {
+  transform: translateY(-1px);
 }
 
 @layer base {

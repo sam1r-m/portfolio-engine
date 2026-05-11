@@ -61,12 +61,14 @@ function Tile({
   valueClassName?: string;
 }) {
   return (
-    <Card>
+    <Card className="pressable-surface border border-border/70 ring-0">
       <CardContent className="py-5">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">
+        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
           {label}
         </p>
-        <p className={`mt-2 font-serif text-3xl tracking-tight ${valueClassName ?? ""}`}>
+        <p
+          className={`mt-2 font-serif text-3xl font-semibold tracking-tight text-[var(--ws-black)] ${valueClassName ?? ""}`}
+        >
           {value}
         </p>
         {hint ? (
