@@ -8,7 +8,7 @@ export function Footer() {
       <InsetRule />
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:px-8">
         <p>
-          Built by{" "}
+          © 2026{" "}
           <a
             href="https://samirmd.com"
             target="_blank"
@@ -17,7 +17,6 @@ export function Footer() {
           >
             Samir
           </a>
-          . Your file stays in the browser.
         </p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <Link
@@ -35,7 +34,8 @@ export function Footer() {
             GitHub
           </a>
           <span>
-            Not affiliated with <WealthsimpleWord />.
+            <span className="underline underline-offset-2">Not</span> affiliated with <WealthsimpleWord />.
+       
           </span>
         </div>
       </div>

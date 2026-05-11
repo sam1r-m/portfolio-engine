@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
+import { AsciiCoinLoop } from "@/components/landing/ascii-coin-loop";
 import { Dropzone } from "@/components/import/dropzone";
 import { InsetRule } from "@/components/layout/inset-rule";
 
@@ -6,62 +8,77 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-6xl px-6 sm:px-8">
       <section className="py-20 sm:py-28">
-        <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)] sm:text-5xl md:text-6xl">
-          Portfolio Engine
-        </h1>
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Side project I wrote for my own holdings export from{" "}
-          <WealthsimpleWord />. You grab the official report csv, drop it
-          here, and the tables and charts run entirely in the browser. A
-          small api route only ever sees public ticker keys when it needs
-          sector or industry text. Your quantities and balances never get
-          sent up. A handful of etfs I mapped manually split into sector
-          slices so the donut is not one giant etf block.
-        </p>
-        <div className="mt-10 max-w-xl">
-          <Dropzone />
+        <div className="grid grid-cols-1 items-start gap-10 sm:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)] xl:gap-14">
+          <div className="min-w-0">
+            <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)] sm:text-5xl md:text-6xl">
+              Portfolio Engine
+            </h1>
+            <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Side project I wrote for my own holdings export from{" "}
+              <WealthsimpleWord />. Grab the official report csv, drop it
+              here, and the tables and charts run entirely in the browser.
+            </p>
+            <div className="mt-10 max-w-xl">
+              <Dropzone />
+            </div>
+          </div>
+          <div className="mt-16 min-w-0 w-full max-w-full lg:mt-24 lg:max-w-none lg:-translate-x-10 lg:translate-y-2 lg:justify-self-end xl:-translate-x-14 xl:translate-y-3">
+            <AsciiCoinLoop />
+          </div>
         </div>
-      </section>
-
-      <InsetRule />
-
-      <section className="grid gap-8 py-16 sm:grid-cols-3 sm:gap-6">
-        <Feature title="Local parse">
-          The csv never hits an upload url. PapaParse and zod run in the tab,
-          then zustand holds the rows until you refresh.
-        </Feature>
-        <Feature title="Etf map">
-          Static json weights for funds I actually cared about (veqt style
-          blends, broad us names, a few themes). Your market value gets
-          spread across those sector buckets for the chart.
-        </Feature>
-        <Feature title="Built on the export">
-          Matches the columns in the{" "}
-          <WealthsimpleWord /> holdings report. No broker link, no copy paste
-          grid.
-        </Feature>
       </section>
 
       <InsetRule />
 
       <section className="py-16">
         <h2 className="font-serif text-2xl font-semibold tracking-tight text-[var(--ws-black)] sm:text-3xl">
-          Where to get the csv
+          Features
+        </h2>
+        <div className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-6">
+          <Feature title="Local parsing">
+            The csv never hits an upload url. PapaParse and Zod run in the tab,
+            with Zustand holding the rows until you refresh the page.
+          </Feature>
+          <Feature title="ETF mapping">
+            Static json weights for a few common, popular etfs (broad Canada
+            and US index funds, plus a few thematic names). Your market value
+            gets spread across those sector buckets within the charts.
+          </Feature>
+          <Feature title="Built on the export">
+            Matches the columns in the uploaded{" "}
+            <WealthsimpleWord /> holdings report. No broker links, no copy paste
+            grid, no repetitive manual data entry.
+          </Feature>
+        </div>
+      </section>
+
+      <InsetRule />
+
+      <section className="py-16">
+        <h2 className="font-serif text-2xl font-semibold tracking-tight text-[var(--ws-black)] sm:text-3xl">
+          Holdings Retrieval Process
         </h2>
         <ol className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-6">
           <Step n={1} title="Log in">
-            Open <WealthsimpleWord /> on web or the app and go to your
+            Open <WealthsimpleWord /> on the web and go to your
             profile menu.
           </Step>
           <Step
             n={2}
-            title="Documents, then Holdings Report"
-            body="Pick the account or all accounts and the snapshot date you want."
+            title={
+              <>
+                Documents, then{" "}
+                <span className="underline underline-offset-[3px] decoration-[var(--ws-charcoal)]/50">
+                  Holdings Report
+                </span>
+              </>
+            }
+            body="Pick the account (or all accounts) and the snapshot date you want."
           />
           <Step
             n={3}
             title="Download"
-            body="Save the csv, then drop it in the box above. That is the whole input."
+            body="Save the CSV and drop it in the box above. Parsing happens locally and securely."
           />
         </ol>
       </section>
@@ -95,7 +112,7 @@ function Step({
   body,
 }: {
   n: number;
-  title: string;
+  title: ReactNode;
   children?: React.ReactNode;
   body?: string;
 }) {
