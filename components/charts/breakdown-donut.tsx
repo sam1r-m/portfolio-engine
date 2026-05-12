@@ -3,7 +3,7 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
 import { CHART_PALETTE } from "./chart-palette";
-import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
+import { BreakdownRichTooltip } from "./breakdown-rich-tooltip";
 
 // Cycles CHART_PALETTE; more than five buckets wrap to keep contrast rhythm.
 
@@ -18,6 +18,7 @@ export function BreakdownDonut({
     name: s.label,
     value: s.value.toNumber(),
     percent: s.percent,
+    tooltipLines: s.tooltipLines,
   }));
 
   return (
@@ -38,10 +39,7 @@ export function BreakdownDonut({
               <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
             ))}
           </Pie>
-          <Tooltip
-            contentStyle={TOOLTIP_CONTENT_STYLE}
-            formatter={moneyTooltipFormatter}
-          />
+          <Tooltip content={<BreakdownRichTooltip />} />
         </PieChart>
       </ResponsiveContainer>
     </div>

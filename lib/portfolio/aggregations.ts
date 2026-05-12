@@ -3,10 +3,23 @@ import type { Money } from "@/lib/csv/money";
 import type { HoldingRow } from "@/lib/csv/schema";
 import { etfEntryFor, type EtfLookthrough } from "./etf-lookthrough";
 
+/** One row (or ETF sector portion) contributing to a breakdown slice. */
+export interface SliceTooltipLine {
+  symbol: string;
+  name: string;
+  mic: string;
+  accountNumber: string;
+  valueCad: Money;
+  /** Share of total portfolio market value (CAD), 0–100. */
+  pctOfPortfolio: number;
+}
+
 export interface BreakdownSlice {
   label: string;
   value: Money;
   percent: number; // 0..100
+  /** Holdings behind this slice (built in dashboard for rich tooltips). */
+  tooltipLines?: SliceTooltipLine[];
 }
 
 export interface EnrichmentEntry {
@@ -151,7 +164,7 @@ export function byAssetClass(
 const US_MICS = new Set(["XNAS", "XNYS", "BATS", "ARCX", "XASE", "IEXG"]);
 const CA_MICS = new Set(["XTSE", "XTSX", "XCNQ", "AEQL", "NEOE"]);
 
-function geographyFor(mic: string): string {
+function geographyLabel(mic: string): string {
   if (US_MICS.has(mic)) return "United States";
   if (CA_MICS.has(mic)) return "Canada";
   return "International";
@@ -166,7 +179,7 @@ export function byGeography(
   for (const row of rows) {
     const value = marketValueCad(row, usdToCad);
     total = total.plus(value);
-    addTo(buckets, geographyFor(row.mic), value);
+    addTo(buckets, geographyLabel(row.mic), value);
   }
   return bucketsToSlices(buckets, total);
 }
@@ -198,6 +211,178 @@ export function byAccount(
     addTo(buckets, row.accountType || "Other", value);
   }
   return bucketsToSlices(buckets, total);
+}
+
+function portfolioTotalCad(
+  rows: HoldingRow[],
+  usdToCad: Decimal,
+): Money {
+  return rows.reduce(
+    (acc, row) => acc.plus(marketValueCad(row, usdToCad)),
+    toDecimal(0),
+  );
+}
+
+function pushTooltipLine(
+  lines: SliceTooltipLine[],
+  row: HoldingRow,
+  valueCad: Money,
+  total: Money,
+) {
+  lines.push({
+    symbol: row.symbol,
+    name: row.name,
+    mic: row.mic,
+    accountNumber: row.accountNumber,
+    valueCad,
+    pctOfPortfolio: total.isZero()
+      ? 0
+      : valueCad.div(total).times(100).toNumber(),
+  });
+}
+
+/** Holdings (and ETF look-through portions) that roll into a sector slice. */
+export function sliceDetailLinesForSector(
+  rows: HoldingRow[],
+  sectorLabel: string,
+  enrichment: EnrichmentMap,
+  etfLookthrough: EtfLookthrough | undefined,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): SliceTooltipLine[] {
+  const total = portfolioTotalCad(rows, usdToCad);
+  const lines: SliceTooltipLine[] = [];
+
+  for (const row of rows) {
+    const v = marketValueCad(row, usdToCad);
+    if (row.securityType === "EXCHANGE_TRADED_FUND") {
+      const entry = etfLookthrough
+        ? etfEntryFor(etfLookthrough, row.symbol, row.mic)
+        : undefined;
+      if (entry) {
+        const w = entry.sectorWeights[sectorLabel];
+        if (w !== undefined && w > 0) {
+          const portion = v.times(w).div(100);
+          pushTooltipLine(lines, row, portion, total);
+        }
+      } else if (sectorLabel === "Diversified (ETF)") {
+        pushTooltipLine(lines, row, v, total);
+      }
+    } else {
+      const sector =
+        enrichment.get(enrichmentKey(row.symbol, row.mic))?.sector ??
+        "Unclassified";
+      if (sector === sectorLabel) {
+        pushTooltipLine(lines, row, v, total);
+      }
+    }
+  }
+
+  lines.sort((a, b) => b.valueCad.minus(a.valueCad).toNumber());
+  return lines;
+}
+
+/** Equities and ETF rows for an industry bucket (ETFs stay under Diversified). */
+export function sliceDetailLinesForIndustry(
+  rows: HoldingRow[],
+  industryLabel: string,
+  enrichment: EnrichmentMap,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): SliceTooltipLine[] {
+  const total = portfolioTotalCad(rows, usdToCad);
+  const lines: SliceTooltipLine[] = [];
+
+  for (const row of rows) {
+    const v = marketValueCad(row, usdToCad);
+    if (row.securityType === "EXCHANGE_TRADED_FUND") {
+      if (industryLabel === "Diversified (ETF)") {
+        pushTooltipLine(lines, row, v, total);
+      }
+      continue;
+    }
+    const industry =
+      enrichment.get(enrichmentKey(row.symbol, row.mic))?.industry ??
+      "Unclassified";
+    if (industry === industryLabel) {
+      pushTooltipLine(lines, row, v, total);
+    }
+  }
+
+  lines.sort((a, b) => b.valueCad.minus(a.valueCad).toNumber());
+  return lines;
+}
+
+function assetClassBucketLabel(row: HoldingRow): string {
+  return ASSET_CLASS_LABEL[row.securityType] ?? row.securityType;
+}
+
+export function sliceDetailLinesForAssetClass(
+  rows: HoldingRow[],
+  classLabel: string,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): SliceTooltipLine[] {
+  const total = portfolioTotalCad(rows, usdToCad);
+  const lines: SliceTooltipLine[] = [];
+
+  for (const row of rows) {
+    if (assetClassBucketLabel(row) !== classLabel) continue;
+    pushTooltipLine(lines, row, marketValueCad(row, usdToCad), total);
+  }
+
+  lines.sort((a, b) => b.valueCad.minus(a.valueCad).toNumber());
+  return lines;
+}
+
+export function sliceDetailLinesForGeography(
+  rows: HoldingRow[],
+  geoLabel: string,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): SliceTooltipLine[] {
+  const total = portfolioTotalCad(rows, usdToCad);
+  const lines: SliceTooltipLine[] = [];
+
+  for (const row of rows) {
+    if (geographyLabel(row.mic) !== geoLabel) continue;
+    pushTooltipLine(lines, row, marketValueCad(row, usdToCad), total);
+  }
+
+  lines.sort((a, b) => b.valueCad.minus(a.valueCad).toNumber());
+  return lines;
+}
+
+export function sliceDetailLinesForCurrency(
+  rows: HoldingRow[],
+  currencyLabel: string,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): SliceTooltipLine[] {
+  const total = portfolioTotalCad(rows, usdToCad);
+  const lines: SliceTooltipLine[] = [];
+
+  for (const row of rows) {
+    const cur = row.marketValueCurrency || "Other";
+    if (cur !== currencyLabel) continue;
+    pushTooltipLine(lines, row, marketValueCad(row, usdToCad), total);
+  }
+
+  lines.sort((a, b) => b.valueCad.minus(a.valueCad).toNumber());
+  return lines;
+}
+
+export function sliceDetailLinesForAccount(
+  rows: HoldingRow[],
+  accountLabel: string,
+  usdToCad: Decimal = USD_TO_CAD_FALLBACK,
+): SliceTooltipLine[] {
+  const total = portfolioTotalCad(rows, usdToCad);
+  const lines: SliceTooltipLine[] = [];
+
+  for (const row of rows) {
+    const acct = row.accountType || "Other";
+    if (acct !== accountLabel) continue;
+    pushTooltipLine(lines, row, marketValueCad(row, usdToCad), total);
+  }
+
+  lines.sort((a, b) => b.valueCad.minus(a.valueCad).toNumber());
+  return lines;
 }
 
 export interface PortfolioTotals {

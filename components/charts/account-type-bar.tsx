@@ -12,13 +12,14 @@ import {
 } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
 import { CHART_PALETTE } from "./chart-palette";
-import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
+import { BreakdownRichTooltip } from "./breakdown-rich-tooltip";
 
 export function AccountTypeBar({ slices }: { slices: BreakdownSlice[] }) {
   const data = slices.map((s) => ({
     name: s.label,
     value: s.value.toNumber(),
     percent: s.percent,
+    tooltipLines: s.tooltipLines,
   }));
 
   return (
@@ -41,8 +42,7 @@ export function AccountTypeBar({ slices }: { slices: BreakdownSlice[] }) {
           />
           <Tooltip
             cursor={{ fill: "var(--secondary)", opacity: 0.4 }}
-            contentStyle={TOOLTIP_CONTENT_STYLE}
-            formatter={moneyTooltipFormatter}
+            content={<BreakdownRichTooltip />}
           />
           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
             {data.map((_, i) => (

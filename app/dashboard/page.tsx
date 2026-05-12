@@ -29,6 +29,12 @@ import {
   byIndustry,
   bySector,
   portfolioTotals,
+  sliceDetailLinesForAccount,
+  sliceDetailLinesForAssetClass,
+  sliceDetailLinesForCurrency,
+  sliceDetailLinesForGeography,
+  sliceDetailLinesForIndustry,
+  sliceDetailLinesForSector,
   topHoldings,
 } from "@/lib/portfolio/aggregations";
 import { portfolioDataQuality } from "@/lib/portfolio/data-quality";
@@ -61,12 +67,39 @@ export default function DashboardPage() {
     if (!filtered) return null;
     return {
       totals: portfolioTotals(filtered),
-      sector: bySector(filtered, enrichment, etfLookthrough),
-      industry: byIndustry(filtered, enrichment),
-      assetClass: byAssetClass(filtered),
-      geography: byGeography(filtered),
-      currency: byCurrency(filtered),
-      account: byAccount(filtered),
+      sector: bySector(filtered, enrichment, etfLookthrough).map((s) => ({
+        ...s,
+        tooltipLines: sliceDetailLinesForSector(
+          filtered,
+          s.label,
+          enrichment,
+          etfLookthrough,
+        ),
+      })),
+      industry: byIndustry(filtered, enrichment).map((s) => ({
+        ...s,
+        tooltipLines: sliceDetailLinesForIndustry(
+          filtered,
+          s.label,
+          enrichment,
+        ),
+      })),
+      assetClass: byAssetClass(filtered).map((s) => ({
+        ...s,
+        tooltipLines: sliceDetailLinesForAssetClass(filtered, s.label),
+      })),
+      geography: byGeography(filtered).map((s) => ({
+        ...s,
+        tooltipLines: sliceDetailLinesForGeography(filtered, s.label),
+      })),
+      currency: byCurrency(filtered).map((s) => ({
+        ...s,
+        tooltipLines: sliceDetailLinesForCurrency(filtered, s.label),
+      })),
+      account: byAccount(filtered).map((s) => ({
+        ...s,
+        tooltipLines: sliceDetailLinesForAccount(filtered, s.label),
+      })),
       top: topHoldings(filtered, enrichment, 25),
     };
   }, [filtered, enrichment, etfLookthrough]);

@@ -3,7 +3,7 @@
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
 import { CHART_PALETTE } from "./chart-palette";
-import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
+import { BreakdownRichTooltip } from "./breakdown-rich-tooltip";
 
 // Matches donut palette for a cohesive dashboard.
 
@@ -68,6 +68,7 @@ export function IndustryTreemap({ slices }: { slices: BreakdownSlice[] }) {
     name: s.label,
     value: s.value.toNumber(),
     percent: s.percent,
+    tooltipLines: s.tooltipLines,
   }));
 
   return (
@@ -80,10 +81,7 @@ export function IndustryTreemap({ slices }: { slices: BreakdownSlice[] }) {
           stroke="var(--background)"
           content={(props) => <TreemapNode {...(props as NodeProps)} />}
         >
-          <Tooltip
-            contentStyle={TOOLTIP_CONTENT_STYLE}
-            formatter={moneyTooltipFormatter}
-          />
+          <Tooltip content={<BreakdownRichTooltip />} />
         </Treemap>
       </ResponsiveContainer>
     </div>
