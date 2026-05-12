@@ -2,17 +2,10 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
+import { CHART_PALETTE } from "./chart-palette";
 import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
 
-// 5 brand chart colors cycled; if you have more than 5 buckets the later
-// ones loop around. Good enough for most breakdowns.
-const PALETTE = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-];
+// Cycles CHART_PALETTE; more than five buckets wrap to keep contrast rhythm.
 
 export function BreakdownDonut({
   slices,
@@ -42,7 +35,7 @@ export function BreakdownDonut({
             paddingAngle={1}
           >
             {data.map((_, i) => (
-              <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
+              <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
             ))}
           </Pie>
           <Tooltip

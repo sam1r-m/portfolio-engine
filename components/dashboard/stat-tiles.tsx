@@ -19,7 +19,7 @@ export function StatTiles({
   const pnlColor = totals.unrealizedPlCad.isZero()
     ? "text-muted-foreground"
     : isUp
-      ? "text-emerald-700"
+      ? "text-[color:var(--chart-1)]"
       : "text-destructive";
 
   return (

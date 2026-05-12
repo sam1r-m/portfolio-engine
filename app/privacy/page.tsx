@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DashboardBackHome } from "@/components/dashboard/dashboard-back-home";
 
 export const metadata: Metadata = {
   title: "Privacy · Portfolio Engine",
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-20 sm:px-8">
+      <DashboardBackHome className="mb-8" />
       <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
         Privacy
       </p>
@@ -43,7 +45,7 @@ export default function PrivacyPage() {
         </Section>
 
         <Section title="Source is public.">
-          Code lives on{" "}
+          Open sourced on{" "}
           <a
             href="https://github.com/sam1r-m/portfolio-engine"
             target="_blank"
@@ -54,15 +56,6 @@ export default function PrivacyPage() {
           </a>
           . The enrich handler is a single file if you want to read the exact
           request shape.
-        </Section>
-
-        <Section title="Session tab storage (same tab only).">
-          That mirror is tab-scoped only: closing the tab clears it, and
-          choosing Replace CSV on the dashboard clears it as well. It does not
-          sync across devices and is never sent to us. Nothing from the
-          holdings file is written to our servers except the symbol and mic
-          list sent to <code className="text-sm">/api/enrich</code> as
-          described above.
         </Section>
       </div>
     </main>

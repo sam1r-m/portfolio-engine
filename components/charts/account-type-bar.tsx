@@ -4,12 +4,14 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
+import { CHART_PALETTE } from "./chart-palette";
 import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
 
 export function AccountTypeBar({ slices }: { slices: BreakdownSlice[] }) {
@@ -42,7 +44,14 @@ export function AccountTypeBar({ slices }: { slices: BreakdownSlice[] }) {
             contentStyle={TOOLTIP_CONTENT_STYLE}
             formatter={moneyTooltipFormatter}
           />
-          <Bar dataKey="value" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+            {data.map((_, i) => (
+              <Cell
+                key={`bar-${i}`}
+                fill={CHART_PALETTE[i % CHART_PALETTE.length]}
+              />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

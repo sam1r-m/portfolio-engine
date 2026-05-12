@@ -2,16 +2,10 @@
 
 import { ResponsiveContainer, Tooltip, Treemap } from "recharts";
 import type { BreakdownSlice } from "@/lib/portfolio/aggregations";
+import { CHART_PALETTE } from "./chart-palette";
 import { TOOLTIP_CONTENT_STYLE, moneyTooltipFormatter } from "./chart-tooltip";
 
-// Same 5-color rotation as the donut for visual consistency.
-const PALETTE = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-];
+// Matches donut palette for a cohesive dashboard.
 
 interface NodeProps {
   x: number;
@@ -26,7 +20,7 @@ interface NodeProps {
 
 function TreemapNode(props: NodeProps) {
   const { x, y, width, height, index, name, percent } = props;
-  const fill = PALETTE[index % PALETTE.length];
+  const fill = CHART_PALETTE[index % CHART_PALETTE.length];
   const showLabel = width > 70 && height > 28;
   return (
     <g>
