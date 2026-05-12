@@ -8,7 +8,7 @@ import { InsetRule } from "@/components/layout/inset-rule";
 export default function Home() {
   return (
     <main className="mx-auto max-w-6xl px-6 sm:px-8">
-      <section className="py-14 sm:py-20 lg:py-28">
+      <section className="overflow-x-hidden py-14 sm:py-20 lg:py-28">
         <div className="grid grid-cols-1 items-start gap-8 sm:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)] xl:gap-14">
           <div className="min-w-0">
             <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)] sm:text-5xl md:text-6xl">

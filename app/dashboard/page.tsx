@@ -117,7 +117,7 @@ export default function DashboardPage() {
         <StatTiles totals={data.totals} snapshotDate={snapshotDate} />
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-2">
+      <div className="mt-10 grid min-w-0 gap-6 lg:grid-cols-2">
         <ChartCard title="By sector">
           <SectorDonut slices={data.sector} />
         </ChartCard>
@@ -158,13 +158,13 @@ function ChartCard({
   children: ReactNode;
 }) {
   return (
-    <Card className="pressable-surface border border-border/70 ring-0">
+    <Card className="pressable-surface min-w-0 border border-border/70 ring-0">
       <CardHeader>
         <CardTitle className="font-serif text-xl font-semibold tracking-tight text-[var(--ws-black)]">
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="min-w-0">{children}</CardContent>
     </Card>
   );
 }

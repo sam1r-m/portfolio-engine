@@ -70,7 +70,7 @@ export function Dropzone() {
       <Button
         type="button"
         variant="outline"
-        className="choose-file-gold mt-6 border bg-background font-semibold text-[var(--ws-black)] transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        className="pressable-surface mt-6 border-[var(--ws-charcoal)]/25 bg-background font-medium text-[var(--ws-charcoal)] hover:bg-secondary"
         onClick={() => inputRef.current?.click()}
       >
         Choose file

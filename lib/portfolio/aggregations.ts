@@ -236,6 +236,8 @@ export function portfolioTotals(
 const marketValueCad_ = marketValueCad;
 
 export interface TopHolding {
+  /** Stable across duplicate tickers (e.g. same ETF in two accounts). */
+  rowKey: string;
   symbol: string;
   name: string;
   marketValueCad: Money;
@@ -261,6 +263,7 @@ export function topHoldings(
         ? row.marketUnrealizedReturns.times(usdToCad)
         : row.marketUnrealizedReturns;
       return {
+        rowKey: `${row.accountNumber}|${row.symbol}|${row.mic}`,
         symbol: row.symbol,
         name: row.name,
         marketValueCad: value,

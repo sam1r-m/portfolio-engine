@@ -22,8 +22,19 @@ export function ContinueToDashboard({ className }: { className?: string }) {
     >
       <p className="text-sm text-muted-foreground">
         You already have a portfolio loaded
-        {fileName ? ` (${fileName})` : ""}. Data stays in this tab until you
-        close it or replace the file.
+        {fileName ? (
+          <>
+            {" "}
+            (
+            <span className="font-semibold text-[var(--ws-charcoal)]">
+              {fileName}
+            </span>
+            ).
+          </>
+        ) : (
+          "."
+        )}{" "}
+        Data stays in this tab until you close it or replace the file.
       </p>
       <Link
         href="/dashboard"

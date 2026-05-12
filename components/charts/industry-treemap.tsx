@@ -77,8 +77,8 @@ export function IndustryTreemap({ slices }: { slices: BreakdownSlice[] }) {
   }));
 
   return (
-    <div className="h-80 w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-80 min-h-0 w-full min-w-0">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <Treemap
           data={data}
           dataKey="value"

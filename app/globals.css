@@ -170,41 +170,6 @@ a {
   transform: translateY(-1px);
 }
 
-/* Choose file: neutral default, soft static gold glow on hover (no animation). */
-.choose-file-gold {
-  border-color: color-mix(in srgb, var(--ws-charcoal) 22%, transparent);
-  background-color: var(--background);
-  box-shadow:
-    0 1px 0 0 rgb(255 255 255 / 0.55) inset,
-    0 1px 2px rgb(20 20 19 / 0.05);
-  transition:
-    box-shadow 0.2s ease,
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-@media (hover: hover) {
-  .choose-file-gold:hover {
-    border-color: rgb(255 215 0 / 0.55);
-    background-color: #fffcf0;
-    box-shadow:
-      0 0 0 1px rgb(255 215 0 / 0.22) inset,
-      0 1px 0 0 rgb(255 255 255 / 0.6) inset,
-      0 0 16px rgb(255 215 0 / 0.2),
-      0 6px 22px rgb(255 200 0 / 0.14);
-  }
-}
-
-.choose-file-gold:focus-visible:not(:hover) {
-  border-color: rgb(255 215 0 / 0.5);
-  background-color: #fffbf0;
-  box-shadow:
-    0 0 0 1px rgb(255 215 0 / 0.2) inset,
-    0 1px 0 0 rgb(255 255 255 / 0.55) inset,
-    0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent);
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;

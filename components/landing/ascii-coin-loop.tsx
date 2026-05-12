@@ -38,7 +38,7 @@ function reducedMotionServerSnapshot() {
  * Scales to the column width so the grid does not get blown out by long lines.
  */
 export function AsciiCoinLoop({ className }: { className?: string }) {
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLAnchorElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
   const [boxH, setBoxH] = useState(0);
@@ -128,14 +128,17 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
   }, [applyScale, prefersReducedMotion]);
 
   return (
-    <div
+    <a
       ref={wrapRef}
+      href="https://ascii.samirmd.com"
+      target="_blank"
+      rel="noopener noreferrer"
       className={cn(
-        "w-full min-w-0 overflow-x-visible overflow-y-hidden bg-transparent p-0",
+        "block w-full min-w-0 cursor-pointer overflow-hidden rounded-sm bg-transparent p-0 text-inherit no-underline outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
       style={boxH > 0 ? { height: boxH } : undefined}
-      aria-label="Decorative coin animation"
+      aria-label="ASCII art on ascii.samirmd.com (opens in a new tab)"
     >
       <div ref={innerRef} className="inline-block will-change-transform">
         <pre
@@ -145,6 +148,6 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
           aria-hidden="true"
         />
       </div>
-    </div>
+    </a>
   );
 }

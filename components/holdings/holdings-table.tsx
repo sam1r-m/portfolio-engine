@@ -83,7 +83,7 @@ export function HoldingsTable({ rows }: { rows: TopHolding[] }) {
         </TableHeader>
         <TableBody>
           {sorted.map((h) => (
-            <TableRow key={`${h.symbol}-${h.name}`}>
+            <TableRow key={h.rowKey}>
               <TableCell className="font-medium">{h.symbol}</TableCell>
               <TableCell className="text-muted-foreground">{h.name}</TableCell>
               <TableCell className="text-right tabular-nums">
