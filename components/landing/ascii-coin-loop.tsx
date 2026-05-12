@@ -1,11 +1,36 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { fps, frames } from "@/lib/data/ascii-coin-frames.js";
 import { cn } from "@/lib/utils";
 
-/** >1 plays faster than the export’s nominal fps (1.8 ≈ 80% faster). */
+/** >1 plays faster than the export’s nominal fps. */
 const PLAYBACK_SPEED = 1.3;
+
+const isNarrowViewport = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(max-width: 1023px)").matches;
+
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function reducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function reducedMotionServerSnapshot() {
+  return false;
+}
 
 /**
  * DOM ascii loop (selectable text). Data from ascii-mation export
@@ -17,6 +42,11 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
   const innerRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
   const [boxH, setBoxH] = useState(0);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    reducedMotionSnapshot,
+    reducedMotionServerSnapshot,
+  );
 
   const applyScale = useCallback(() => {
     const wrap = wrapRef.current;
@@ -34,10 +64,8 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     const ph = pre.offsetHeight;
     if (pw < 1 || ph < 1) return;
 
-    // Never exceed column width: scaled width = pw * s <= cw  =>  s <= fit = cw/pw.
-    // Up to 1.8× natural size when the column is wide enough (80% larger than 1×).
     const fit = cw / pw;
-    const maxScale = 1.8;
+    const maxScale = isNarrowViewport() ? 1.28 : 1.8;
     const s = Math.min(fit, maxScale);
     inner.style.transform = `scale(${s})`;
     inner.style.transformOrigin = "top left";
@@ -63,11 +91,24 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
   }, [applyScale]);
 
   useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const onChange = () => applyScale();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [applyScale]);
+
+  useEffect(() => {
     if (!frames.length) return;
     const pre = preRef.current;
     if (!pre) return;
 
-    let start = performance.now();
+    if (prefersReducedMotion) {
+      pre.textContent = frames[0];
+      requestAnimationFrame(applyScale);
+      return;
+    }
+
+    const start = performance.now();
     let lastIndex = -1;
     const frameMs = 1000 / (fps * PLAYBACK_SPEED);
     let id: number;
@@ -84,7 +125,7 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
 
     id = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(id);
-  }, [applyScale]);
+  }, [applyScale, prefersReducedMotion]);
 
   return (
     <div
@@ -94,11 +135,12 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
         className,
       )}
       style={boxH > 0 ? { height: boxH } : undefined}
+      aria-label="Decorative coin animation"
     >
       <div ref={innerRef} className="inline-block will-change-transform">
         <pre
           ref={preRef}
-          className="font-mono text-[11px] leading-[1.15] tracking-normal text-[#000000] antialiased sm:text-[18px]"
+          className="font-mono text-[16.5px] leading-[1.15] tracking-normal text-[#000000] antialiased sm:text-[18px]"
           style={{ whiteSpace: "pre", fontFamily: "ui-monospace, monospace" }}
           aria-hidden="true"
         />

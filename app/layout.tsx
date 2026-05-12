@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Libre_Caslon_Text, Montserrat } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PortfolioRehydrate } from "@/components/providers/portfolio-rehydrate";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -49,6 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${montserrat.variable} ${libreCaslon.variable}`}>
       <body className="flex min-h-screen flex-col font-sans antialiased">
+        <PortfolioRehydrate />
         <Header />
         <div className="flex-1">{children}</div>
         <Footer />

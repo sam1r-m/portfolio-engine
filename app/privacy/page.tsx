@@ -20,7 +20,12 @@ export default function PrivacyPage() {
         <Section title="The csv never leaves your machine.">
           When you drop the report on the upload area, it is parsed in the
           tab with the FileReader api, PapaParse, and a zod schema. Rows sit
-          in a zustand store. That path never opens a network request.
+          in a zustand store, and for that tab the app mirrors them in{" "}
+          <code className="rounded bg-muted/80 px-1 py-0.5 text-sm">
+            sessionStorage
+          </code>{" "}
+          so a normal refresh keeps the dashboard. That parse path never opens
+          a network request.
         </Section>
 
         <Section title="The only server call is /api/enrich.">
@@ -33,8 +38,8 @@ export default function PrivacyPage() {
 
         <Section title="No accounts or analytics.">
           No login, no tracking snippet, no third party font host that could
-          fingerprint you. localStorage only has whatever Next dev mode writes
-          during hot reload, nothing tied to your portfolio.
+          fingerprint you. Next dev mode may write to localStorage during hot
+          reload; nothing there is tied to your portfolio by this app.
         </Section>
 
         <Section title="Source is public.">
@@ -51,9 +56,13 @@ export default function PrivacyPage() {
           request shape.
         </Section>
 
-        <Section title="Reload clears the store.">
-          Everything is in memory. Close the tab or refresh and the rows are
-          gone. Import the csv again whenever you want a fresh pass.
+        <Section title="Session tab storage (same tab only).">
+          That mirror is tab-scoped only: closing the tab clears it, and
+          choosing Replace CSV on the dashboard clears it as well. It does not
+          sync across devices and is never sent to us. Nothing from the
+          holdings file is written to our servers except the symbol and mic
+          list sent to <code className="text-sm">/api/enrich</code> as
+          described above.
         </Section>
       </div>
     </main>

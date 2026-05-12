@@ -4,24 +4,46 @@ import { useEffect, useState } from "react";
 import type { HoldingRow } from "@/lib/csv/schema";
 import { enrichmentKey, type EnrichmentMap } from "./aggregations";
 
-export function useEnrichment(rows: HoldingRow[] | null): EnrichmentMap {
+export type EnrichmentFetchStatus = "idle" | "loading" | "done" | "error";
+
+export function useEnrichment(rows: HoldingRow[] | null): {
+  map: EnrichmentMap;
+  status: EnrichmentFetchStatus;
+} {
   const [map, setMap] = useState<EnrichmentMap>(() => new Map());
+  const [status, setStatus] = useState<EnrichmentFetchStatus>("idle");
 
   useEffect(() => {
-    if (!rows || rows.length === 0) return;
+    if (!rows || rows.length === 0) {
+      queueMicrotask(() => {
+        setMap(new Map());
+        setStatus("idle");
+      });
+      return;
+    }
 
-    // Only equities need sector enrichment -- ETFs go through look-through
     const tickers = [
       ...new Map(
         rows
           .filter((r) => r.securityType === "EQUITY")
-          .map((r) => [enrichmentKey(r.symbol, r.mic), { symbol: r.symbol, mic: r.mic }]),
+          .map((r) => [
+            enrichmentKey(r.symbol, r.mic),
+            { symbol: r.symbol, mic: r.mic },
+          ]),
       ).values(),
     ];
 
-    if (tickers.length === 0) return;
+    if (tickers.length === 0) {
+      queueMicrotask(() => {
+        setMap(new Map());
+        setStatus("done");
+      });
+      return;
+    }
 
+    queueMicrotask(() => setStatus("loading"));
     let cancelled = false;
+
     (async () => {
       try {
         const res = await fetch("/api/enrich", {
@@ -29,7 +51,10 @@ export function useEnrichment(rows: HoldingRow[] | null): EnrichmentMap {
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ tickers }),
         });
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (!cancelled) setStatus("error");
+          return;
+        }
         const data = (await res.json()) as {
           enrichment: Record<string, { sector: string; industry: string }>;
         };
@@ -37,9 +62,9 @@ export function useEnrichment(rows: HoldingRow[] | null): EnrichmentMap {
         const next = new Map<string, { sector: string; industry: string }>();
         for (const [k, v] of Object.entries(data.enrichment)) next.set(k, v);
         setMap(next);
+        setStatus("done");
       } catch {
-        // network problems shouldn't break the dashboard -- charts just
-        // show "Unclassified" for missing tickers
+        if (!cancelled) setStatus("error");
       }
     })();
 
@@ -48,5 +73,5 @@ export function useEnrichment(rows: HoldingRow[] | null): EnrichmentMap {
     };
   }, [rows]);
 
-  return map;
+  return { map, status };
 }

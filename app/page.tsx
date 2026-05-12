@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
 import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
 import { AsciiCoinLoop } from "@/components/landing/ascii-coin-loop";
+import { ContinueToDashboard } from "@/components/landing/continue-to-dashboard";
 import { Dropzone } from "@/components/import/dropzone";
 import { InsetRule } from "@/components/layout/inset-rule";
 
 export default function Home() {
   return (
     <main className="mx-auto max-w-6xl px-6 sm:px-8">
-      <section className="py-20 sm:py-28">
-        <div className="grid grid-cols-1 items-start gap-10 sm:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)] xl:gap-14">
+      <section className="py-14 sm:py-20 lg:py-28">
+        <div className="grid grid-cols-1 items-start gap-8 sm:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,360px)] xl:gap-14">
           <div className="min-w-0">
             <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)] sm:text-5xl md:text-6xl">
               Portfolio Engine
@@ -18,11 +19,12 @@ export default function Home() {
               <WealthsimpleWord />. Grab the official report csv, drop it
               here, and the tables and charts run entirely in the browser.
             </p>
-            <div className="mt-10 max-w-xl">
+            <div className="mt-10 max-w-xl space-y-4">
               <Dropzone />
+              <ContinueToDashboard />
             </div>
           </div>
-          <div className="mt-16 min-w-0 w-full max-w-full lg:mt-24 lg:max-w-none lg:-translate-x-10 lg:translate-y-2 lg:justify-self-end xl:-translate-x-14 xl:translate-y-3">
+          <div className="mt-14 min-w-0 w-full max-w-full max-lg:mx-auto max-lg:max-w-[min(100%,380px)] lg:mt-24 lg:max-w-none lg:-translate-x-10 lg:translate-y-2 lg:justify-self-end xl:-translate-x-14 xl:translate-y-3">
             <AsciiCoinLoop />
           </div>
         </div>

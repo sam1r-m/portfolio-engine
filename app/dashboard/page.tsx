@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,9 @@ import { CurrencyDonut } from "@/components/charts/currency-donut";
 import { GeographyDonut } from "@/components/charts/geography-donut";
 import { IndustryTreemap } from "@/components/charts/industry-treemap";
 import { SectorDonut } from "@/components/charts/sector-donut";
+import { DashboardBackHome } from "@/components/dashboard/dashboard-back-home";
+import { DataQualityStrip } from "@/components/dashboard/data-quality-strip";
+import { ReplaceCsvButton } from "@/components/dashboard/replace-csv-button";
 import {
   AccountFilter,
   ALL_ACCOUNTS,
@@ -16,6 +20,7 @@ import {
 import { StatTiles } from "@/components/dashboard/stat-tiles";
 import { HoldingsTable } from "@/components/holdings/holdings-table";
 import { usePortfolioStore } from "@/lib/store/portfolio";
+import { usePortfolioHydrated } from "@/lib/store/use-portfolio-hydrated";
 import {
   byAccount,
   byAssetClass,
@@ -25,8 +30,8 @@ import {
   bySector,
   portfolioTotals,
   topHoldings,
-  type EnrichmentMap,
 } from "@/lib/portfolio/aggregations";
+import { portfolioDataQuality } from "@/lib/portfolio/data-quality";
 import { loadEtfLookthrough } from "@/lib/portfolio/etf-lookthrough";
 import { useEnrichment } from "@/lib/portfolio/use-enrichment";
 
@@ -34,13 +39,16 @@ export default function DashboardPage() {
   const holdings = usePortfolioStore((s) => s.holdings);
   const snapshotDate = usePortfolioStore((s) => s.snapshotDate);
   const router = useRouter();
+  const hydrated = usePortfolioHydrated();
   const [accountFilter, setAccountFilter] = useState<string>(ALL_ACCOUNTS);
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!holdings) router.replace("/");
-  }, [holdings, router]);
+  }, [holdings, hydrated, router]);
 
-  const enrichment: EnrichmentMap = useEnrichment(holdings);
+  const { map: enrichment, status: enrichmentStatus } =
+    useEnrichment(holdings);
   const etfLookthrough = useMemo(() => loadEtfLookthrough(), []);
 
   const filtered = useMemo(() => {
@@ -63,19 +71,46 @@ export default function DashboardPage() {
     };
   }, [filtered, enrichment, etfLookthrough]);
 
-  if (!holdings || !filtered || !data) return null;
+  const quality = useMemo(() => {
+    if (!filtered) return null;
+    return portfolioDataQuality(filtered, enrichment, etfLookthrough);
+  }, [filtered, enrichment, etfLookthrough]);
+
+  if (!hydrated) {
+    return (
+      <main className="mx-auto max-w-6xl px-6 py-12 sm:px-8">
+        <p className="text-sm text-muted-foreground">Loading your session…</p>
+      </main>
+    );
+  }
+
+  if (!holdings || !filtered || !data || !quality) return null;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12 sm:px-8">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)]">
-          Your portfolio
-        </h1>
-        <AccountFilter
-          rows={holdings}
-          value={accountFilter}
-          onChange={setAccountFilter}
-        />
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+          <DashboardBackHome className="sm:mt-1" />
+          <div className="min-w-0 flex-1 space-y-4">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)]">
+                Your portfolio
+              </h1>
+              <div className="flex flex-wrap items-center gap-3">
+                <ReplaceCsvButton />
+                <AccountFilter
+                  rows={holdings}
+                  value={accountFilter}
+                  onChange={setAccountFilter}
+                />
+              </div>
+            </div>
+            <DataQualityStrip
+              enrichmentStatus={enrichmentStatus}
+              quality={quality}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="mt-8">
@@ -120,7 +155,7 @@ function ChartCard({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <Card className="pressable-surface border border-border/70 ring-0">
