@@ -22,6 +22,9 @@
 
 # misc
 .DS_Store
+
+# never commit real holdings exports
+example_wealthsimple_holdings_report.csv
 *.pem
 
 # debug

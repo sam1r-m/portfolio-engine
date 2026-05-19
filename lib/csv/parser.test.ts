@@ -4,7 +4,7 @@ import path from "node:path";
 import { CsvFormatError, parseHoldingsCsv } from "./parser";
 
 const FIXTURE = fs.readFileSync(
-  path.join(__dirname, "../../example_wealthsimple_holdings_report.csv"),
+  path.join(__dirname, "fixtures/sample_holdings_report.csv"),
   "utf8",
 );
 

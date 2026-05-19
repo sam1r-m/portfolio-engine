@@ -15,7 +15,7 @@ import {
 } from "./aggregations";
 
 const FIXTURE = fs.readFileSync(
-  path.join(__dirname, "../../example_wealthsimple_holdings_report.csv"),
+  path.join(__dirname, "../csv/fixtures/sample_holdings_report.csv"),
   "utf8",
 );
 
