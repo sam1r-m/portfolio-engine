@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
 import { AsciiCoinLoop } from "@/components/landing/ascii-coin-loop";
 import { ContinueToDashboard } from "@/components/landing/continue-to-dashboard";
+import { DemoPortfolioPanel } from "@/components/import/demo-portfolio-panel";
 import { Dropzone } from "@/components/import/dropzone";
 import { InsetRule } from "@/components/layout/inset-rule";
 
@@ -15,12 +16,13 @@ export default function Home() {
               Portfolio Engine
             </h1>
             <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Side project I wrote for my own holdings export from{" "}
-              <WealthsimpleWord />. Grab the official report csv, drop it
-              here, and the tables and charts run entirely in the browser.
+              Side project built around the holdings export from{" "}
+              <WealthsimpleWord />. Drop your own csv, or try the sample
+              portfolio below — everything runs in the browser.
             </p>
             <div className="mt-10 max-w-xl space-y-4">
               <Dropzone />
+              <DemoPortfolioPanel />
               <ContinueToDashboard />
             </div>
           </div>

@@ -1,35 +1,15 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
+import { useLoadHoldings } from "@/components/import/use-load-holdings";
 import { Button } from "@/components/ui/button";
-import { CsvFormatError, parseHoldingsCsv } from "@/lib/csv/parser";
-import { usePortfolioStore } from "@/lib/store/portfolio";
 import { cn } from "@/lib/utils";
 
 export function Dropzone() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const setHoldings = usePortfolioStore((s) => s.setHoldings);
-
-  async function handleFile(file: File) {
-    setError(null);
-    try {
-      const text = await file.text();
-      const { rows, snapshotDate } = parseHoldingsCsv(text);
-      setHoldings(rows, snapshotDate, file.name);
-      router.push("/dashboard");
-    } catch (err) {
-      if (err instanceof CsvFormatError) {
-        setError(err.message);
-      } else {
-        setError("Could not read that file. Try a real csv export.");
-      }
-    }
-  }
+  const { loadFromFile, error, loading } = useLoadHoldings();
 
   return (
     <div
@@ -42,7 +22,7 @@ export function Dropzone() {
         e.preventDefault();
         setDragging(false);
         const file = e.dataTransfer.files?.[0];
-        if (file) await handleFile(file);
+        if (file) await loadFromFile(file);
       }}
       className={cn(
         "pressable-surface flex flex-col items-center justify-center rounded-xl border border-dashed border-border/90 bg-card/90 p-12 text-center sm:p-14",
@@ -62,18 +42,20 @@ export function Dropzone() {
         type="file"
         accept=".csv,text/csv"
         className="hidden"
+        disabled={loading}
         onChange={async (e) => {
           const file = e.target.files?.[0];
-          if (file) await handleFile(file);
+          if (file) await loadFromFile(file);
         }}
       />
       <Button
         type="button"
         variant="outline"
+        disabled={loading}
         className="pressable-surface mt-6 border-[var(--ws-charcoal)]/25 bg-background font-medium text-[var(--ws-charcoal)] hover:bg-secondary"
         onClick={() => inputRef.current?.click()}
       >
-        Choose file
+        {loading ? "Parsing…" : "Choose file"}
       </Button>
 
       {error ? (
