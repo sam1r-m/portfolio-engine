@@ -1,43 +1,32 @@
-import Link from "next/link";
-import { WealthsimpleWord } from "@/components/brand/wealthsimple-word";
-import { InsetRule } from "@/components/layout/inset-rule";
-
 export function Footer() {
   return (
-    <footer className="bg-background">
-      <InsetRule />
-      <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:px-8">
+    <footer className="mx-auto w-full max-w-[88rem] px-4 pb-6 sm:px-6 sm:pb-8">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-rule pt-4 text-xs text-ink-2">
         <p>
-          © 2026{" "}
+          Built by{" "}
           <a
             href="https://samirmd.com"
             target="_blank"
             rel="noreferrer"
-            className="nav-lift font-medium text-[var(--ws-charcoal)] underline-offset-4 hover:underline"
+            className="border-b border-rule-strong pb-px text-ink transition-colors hover:border-accent hover:text-accent"
           >
             Samir
           </a>
-        </p>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <Link
-            href="/privacy"
-            className="nav-lift hover:text-[var(--ws-charcoal)]"
-          >
-            Privacy
-          </Link>
+          .{" "}
           <a
             href="https://github.com/sam1r-m/portfolio-engine"
             target="_blank"
             rel="noreferrer"
-            className="nav-lift hover:text-[var(--ws-charcoal)]"
+            className="border-b border-rule-strong pb-px transition-colors hover:border-ink hover:text-ink"
           >
-            GitHub
+            Source
           </a>
-          <span>
-            <span className="underline underline-offset-2">Not</span> affiliated with <WealthsimpleWord />.
-       
-          </span>
-        </div>
+          .
+        </p>
+        <p className="num text-[11px] text-ink-3">
+          Prices and classifications via Yahoo Finance. Not affiliated with
+          Wealthsimple.
+        </p>
       </div>
     </footer>
   );

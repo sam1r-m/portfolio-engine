@@ -17,11 +17,7 @@ export interface PortfolioState {
   clear: () => void;
 }
 
-/**
- * Parsed rows live in memory and in `sessionStorage` for the current tab only
- * so a refresh keeps the dashboard until you close the tab. Clearing the
- * store removes the session entry as well.
- */
+/** sessionStorage, not local: a refresh keeps the dashboard, closing the tab drops it. */
 export const usePortfolioStore = create<PortfolioState>()(
   persist(
     (set) => ({

@@ -1,7 +1,4 @@
-/**
- * The 22 columns the WS Holdings Report ships with. Order matters &mdash;
- * we use this list to fail fast if WS ever changes the format on us.
- */
+/** Every column the export ships with. Missing one means the format moved. */
 export const HOLDINGS_HEADERS = [
   "Account Name",
   "Account Type",
@@ -41,18 +38,13 @@ export type PositionDirection = "LONG" | "SHORT";
 import { z } from "zod";
 import type { Money } from "./money";
 
-// Numeric strings can be huge (up to 30 digits past the decimal) so we just
-// pattern-match instead of parseFloat-ing.
+// Up to 30 digits past the decimal, so match the shape rather than parseFloat it.
 const numericString = z
   .string()
   .refine((s) => s === "" || /^-?\d+(\.\d+)?$/.test(s), {
     message: "expected a numeric value",
   });
 
-/**
- * Zod schema for one raw row coming straight out of PapaParse. Catches
- * malformed/missing values before they hit decimal.js and blow up.
- */
 export const RawHoldingsRowSchema = z.object({
   "Account Name": z.string(),
   "Account Type": z.string(),
@@ -79,10 +71,7 @@ export const RawHoldingsRowSchema = z.object({
 
 export type RawHoldingsRow = z.infer<typeof RawHoldingsRowSchema>;
 
-/**
- * One row of the parsed CSV. Numeric fields are Decimal because WS emits
- * 30-digit values that Number can't hold without rounding.
- */
+/** Money stays Decimal: the export emits values Number would round. */
 export interface HoldingRow {
   accountName: string;
   accountType: string;

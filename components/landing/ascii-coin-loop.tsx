@@ -32,11 +32,7 @@ function reducedMotionServerSnapshot() {
   return false;
 }
 
-/**
- * DOM ascii loop (selectable text). Data from ascii-mation export
- * (`ascii-coin-frames.js`): `fps` + `frames` template strings.
- * Scales to the column width so the grid does not get blown out by long lines.
- */
+/** Frames come out of ascii-mation; the wrapper scales them to fit the column. */
 export function AsciiCoinLoop({ className }: { className?: string }) {
   const wrapRef = useRef<HTMLAnchorElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +61,7 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     if (pw < 1 || ph < 1) return;
 
     const fit = cw / pw;
-    const maxScale = isNarrowViewport() ? 1.28 : 1.8;
+    const maxScale = isNarrowViewport() ? 1.35 : 2.4;
     const s = Math.min(fit, maxScale);
     inner.style.transform = `scale(${s})`;
     inner.style.transformOrigin = "top left";
@@ -143,7 +139,7 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
       <div ref={innerRef} className="inline-block will-change-transform">
         <pre
           ref={preRef}
-          className="font-mono text-[16.5px] leading-[1.15] tracking-normal text-[#000000] antialiased sm:text-[18px]"
+          className="text-ink font-mono text-[16.5px] leading-[1.15] tracking-normal antialiased sm:text-[18px]"
           style={{ whiteSpace: "pre", fontFamily: "ui-monospace, monospace" }}
           aria-hidden="true"
         />

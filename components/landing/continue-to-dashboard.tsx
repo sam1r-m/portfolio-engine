@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { usePortfolioStore } from "@/lib/store/portfolio";
 import { usePortfolioHydrated } from "@/lib/store/use-portfolio-hydrated";
-import { cn } from "@/lib/utils";
 
-export function ContinueToDashboard({ className }: { className?: string }) {
+export function ContinueToDashboard() {
   const hydrated = usePortfolioHydrated();
   const holdings = usePortfolioStore((s) => s.holdings);
   const fileName = usePortfolioStore((s) => s.fileName);
@@ -14,35 +13,22 @@ export function ContinueToDashboard({ className }: { className?: string }) {
   if (!hydrated || !holdings?.length) return null;
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-2 rounded-xl border border-border/70 bg-card/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between",
-        className,
-      )}
+    <Link
+      href="/dashboard"
+      className="group flex items-center justify-between gap-4 border border-ink bg-panel px-4 py-3 transition-colors hover:bg-ink hover:text-white"
     >
-      <p className="text-sm text-muted-foreground">
-        You already have a portfolio loaded
-        {fileName ? (
-          <>
-            {" "}
-            (
-            <span className="font-semibold text-[var(--ws-charcoal)]">
-              {fileName}
-            </span>
-            ).
-          </>
-        ) : (
-          "."
-        )}{" "}
-        Data stays in this tab until you close it or replace the file.
-      </p>
-      <Link
-        href="/dashboard"
-        className="inline-flex items-center justify-center gap-1 self-start rounded-lg border border-[var(--ws-charcoal)]/20 bg-background px-3 py-2 text-sm font-medium text-[var(--ws-charcoal)] transition-colors hover:bg-secondary sm:self-auto"
-      >
-        Open dashboard
-        <ChevronRight className="size-4" aria-hidden />
-      </Link>
-    </div>
+      <span className="min-w-0">
+        <span className="label block group-hover:text-white/70">
+          Already loaded
+        </span>
+        <span className="num mt-1 block truncate text-xs">
+          {fileName ?? "holdings"} · {holdings.length} positions
+        </span>
+      </span>
+      <span className="num flex shrink-0 items-center gap-1.5 text-xs font-medium">
+        Open
+        <ArrowRight aria-hidden className="size-3.5" strokeWidth={2} />
+      </span>
+    </Link>
   );
 }

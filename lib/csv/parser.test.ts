@@ -11,7 +11,6 @@ const FIXTURE = fs.readFileSync(
 describe("parseHoldingsCsv", () => {
   it("parses every row of the example holdings report", () => {
     const { rows } = parseHoldingsCsv(FIXTURE);
-    // Sanity: there should be a bunch of rows and they should all be LONG
     expect(rows.length).toBeGreaterThan(20);
     expect(rows.every((r) => r.positionDirection === "LONG")).toBe(true);
   });
@@ -23,7 +22,6 @@ describe("parseHoldingsCsv", () => {
   });
 
   it("keeps full precision on those huge 30-digit values", () => {
-    // GRGD in the fixture has Book Value 2758.920268754065581929388755
     const { rows } = parseHoldingsCsv(FIXTURE);
     const grgd = rows.find((r) => r.symbol === "GRGD");
     expect(grgd).toBeDefined();
@@ -32,7 +30,6 @@ describe("parseHoldingsCsv", () => {
 
   it("throws when a required column is missing", () => {
     const broken = FIXTURE.split("\n");
-    // nuke the Symbol column from the header
     broken[0] = broken[0].replace(/,Symbol,/, ",");
     expect(() => parseHoldingsCsv(broken.join("\n"))).toThrow(CsvFormatError);
   });

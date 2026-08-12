@@ -29,7 +29,6 @@ export const DIMENSIONS: Dimension[] = [
 
 export interface Constituent {
   position: Position;
-  /** Portion of the position sitting in this bucket, in CAD. */
   valueCad: number;
   /** Portion of the position in this bucket, 0–100. Always 100 unless split. */
   shareOfPosition: number;
@@ -151,7 +150,7 @@ export function allocate(
   });
 }
 
-/** Share of portfolio value in the largest bucket, as a concentration read. */
+/** Share of portfolio value sitting in the N biggest positions. */
 export function concentration(positions: Position[], topN: number): number {
   const total = positions.reduce((a, p) => a + p.valueCad, 0);
   if (total === 0) return 0;

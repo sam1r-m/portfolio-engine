@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Libre_Caslon_Text, Montserrat } from "next/font/google";
+import { Archivo, Azeret_Mono } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { PortfolioRehydrate } from "@/components/providers/portfolio-rehydrate";
 import "./globals.css";
 
-const montserrat = Montserrat({
-  variable: "--font-sans",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
-const libreCaslon = Libre_Caslon_Text({
-  variable: "--font-serif",
+const azeret = Azeret_Mono({
+  variable: "--font-azeret",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "700"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -24,11 +25,11 @@ export const metadata: Metadata = {
     template: "%s · Portfolio Engine",
   },
   description:
-    "Holdings report charts in the browser. Sector and industry breakdowns for Wealthsimple exports.",
+    "Turns a Wealthsimple holdings export into live portfolio composition: ETF look-through, cap size, region, and a basket backtest.",
   openGraph: {
     title: "Portfolio Engine",
     description:
-      "Parse your Wealthsimple holdings csv locally. Charts for sector, industry, geography, and more.",
+      "Drop the Wealthsimple holdings csv. Live prices, real ETF sector weights, cap size and region breakdowns.",
     url: "https://portfolio.samirmd.com",
     siteName: "Portfolio Engine",
     type: "website",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Portfolio Engine",
     description:
-      "Local first portfolio breakdowns from a Wealthsimple holdings export.",
+      "Live portfolio composition from a Wealthsimple holdings export.",
   },
 };
 
@@ -47,8 +48,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${libreCaslon.variable}`}>
-      <body className="flex min-h-screen flex-col font-sans antialiased">
+    <html lang="en" className={`${archivo.variable} ${azeret.variable}`}>
+      <body className="flex min-h-screen flex-col antialiased">
+        {/*
+          THESIS: a measuring instrument for one portfolio, not a dashboard that
+          presents to anyone. Refuses the card-grid of donuts and the four-tile
+          hero the category ships.
+          OWN-WORLD: drafting-paper ground, white panels edge to edge, hairline
+          rules, corner registration ticks, Archivo + Azeret Mono, one
+          ultramarine, gain/loss the only other colour.
+          STORY: drop the export, read what the portfolio is actually made of,
+          trust the numbers enough not to open a spreadsheet.
+          FIRST VIEWPORT: dashboard opens on the value readout measured against
+          book value on a real scale, the basket line beneath it.
+          FORM: instrument panel, user-pinned.
+        */}
         <PortfolioRehydrate />
         <div className="flex-1">{children}</div>
         <Footer />

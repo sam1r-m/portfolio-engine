@@ -3,14 +3,12 @@ import type { Position } from "./positions";
 
 export interface BasketSeries {
   dates: number[];
-  /** Portfolio value in CAD on each date. */
   values: number[];
   /** Benchmark rebased to the basket's opening value so one axis serves both. */
   benchmark: number[] | null;
   benchmarkLabel: string | null;
   /** Share of today's portfolio value that has price history, 0–100. */
   coverage: number;
-  /** Securities with no usable history, excluded from the line. */
   missing: string[];
   changeCad: number;
   changePercent: number;

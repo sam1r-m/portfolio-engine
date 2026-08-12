@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Segmented } from "@/components/instrument/controls";
 import type { HoldingRow } from "@/lib/csv/schema";
 
 export const ALL_ACCOUNTS = "__all__";
@@ -20,29 +14,21 @@ export function AccountFilter({
   value: string;
   onChange: (v: string) => void;
 }) {
-  // Dedupe account types so the dropdown only shows the ones we actually have
-  const accountTypes = Array.from(
+  const types = Array.from(
     new Set(rows.map((r) => r.accountType).filter(Boolean)),
   ).sort();
 
+  if (types.length < 2) return null;
+
   return (
-    <div className="flex items-center gap-3">
-      <label className="text-xs uppercase tracking-widest text-muted-foreground">
-        Account
-      </label>
-      <Select value={value} onValueChange={(v) => onChange(v ?? ALL_ACCOUNTS)}>
-        <SelectTrigger className="w-44">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_ACCOUNTS}>All accounts</SelectItem>
-          {accountTypes.map((t) => (
-            <SelectItem key={t} value={t}>
-              {t}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Segmented
+      label="Filter by account"
+      value={value}
+      onChange={onChange}
+      options={[
+        { value: ALL_ACCOUNTS, label: "All" },
+        ...types.map((t) => ({ value: t, label: t })),
+      ]}
+    />
   );
 }

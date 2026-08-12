@@ -10,7 +10,7 @@ import {
 
 export interface ParsedHoldings {
   rows: HoldingRow[];
-  /** Pulled from the "As of ..." footer row WS sticks at the bottom. */
+  /** From the "As of ..." footer row. */
   snapshotDate: Date | null;
 }
 
@@ -44,10 +44,6 @@ export class CsvFormatError extends Error {
   }
 }
 
-/**
- * Reads the WS Holdings Report CSV. We keep money values as raw strings here
- * &mdash; conversion to numbers happens later so we don't lose precision.
- */
 export function parseHoldingsCsv(text: string): ParsedHoldings {
   const { cleaned, snapshotDate } = extractAsOfFooter(text);
   const result = Papa.parse<Record<string, string>>(cleaned, {
@@ -76,15 +72,15 @@ export function parseHoldingsCsv(text: string): ParsedHoldings {
     const parsed = RawHoldingsRowSchema.safeParse(raw);
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
-      // +2 because: header row is line 1 and array is 0-indexed
+      // +2: header is line 1, array is 0-indexed
       throw new CsvFormatError(
-        `Row ${i + 2}: ${issue?.path.join(".") ?? "row"} &mdash; ${issue?.message ?? "invalid"}`,
+        `Row ${i + 2}: ${issue?.path.join(".") ?? "row"} — ${issue?.message ?? "invalid"}`,
       );
     }
     if (parsed.data["Position Direction"] === "SHORT") {
       throw new CsvFormatError(
         `Row ${i + 2}: ${parsed.data["Symbol"]} is a SHORT position. ` +
-          `Portfolio Engine doesn't handle shorts yet &mdash; sorry!`,
+          `The math here assumes long only.`,
       );
     }
     rows.push(toHoldingRow(parsed.data));

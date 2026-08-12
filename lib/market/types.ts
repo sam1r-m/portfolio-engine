@@ -4,15 +4,13 @@ export interface SymbolRef {
 }
 
 export interface Quote {
-  /** Currency the price is quoted in. */
   currency: string;
   price: number;
   previousClose: number | null;
   changePercent: number | null;
-  /** Quoted currency, straight from Yahoo. */
+  /** In the quote currency, not CAD. */
   marketCap: number | null;
   name: string | null;
-  /** EQUITY, ETF, MUTUALFUND, CRYPTOCURRENCY … */
   quoteType: string | null;
 }
 
@@ -56,7 +54,6 @@ export interface HistoryResponse {
   dates: number[];
   /** Security key → close on each date, forward filled, in the quote currency. */
   closes: Record<string, number[]>;
-  /** Quote currency per security key. */
   currencies: Record<string, string>;
   /** CAD per USD on each date, forward filled. */
   usdCad: number[];

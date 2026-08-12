@@ -1,203 +1,239 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AccountTypeBar } from "@/components/charts/account-type-bar";
-import { AssetClassDonut } from "@/components/charts/asset-class-donut";
-import { CurrencyDonut } from "@/components/charts/currency-donut";
-import { GeographyDonut } from "@/components/charts/geography-donut";
-import { IndustryTreemap } from "@/components/charts/industry-treemap";
-import { SectorDonut } from "@/components/charts/sector-donut";
-import { DashboardBackHome } from "@/components/dashboard/dashboard-back-home";
-import { DataQualityStrip } from "@/components/dashboard/data-quality-strip";
-import { ReplaceCsvButton } from "@/components/dashboard/replace-csv-button";
+import { ArrowLeft } from "lucide-react";
+import { BasketChart } from "@/components/charts/basket-chart";
 import {
   AccountFilter,
   ALL_ACCOUNTS,
 } from "@/components/dashboard/account-filter";
-import { StatTiles } from "@/components/dashboard/stat-tiles";
+import { AllocationPanel } from "@/components/dashboard/allocation-panel";
+import { DataBar } from "@/components/dashboard/data-bar";
+import { ValueScale } from "@/components/dashboard/value-scale";
 import { HoldingsTable } from "@/components/holdings/holdings-table";
+import { Delta, Segmented, Toggle } from "@/components/instrument/controls";
+import { Field, Panel } from "@/components/instrument/panel";
+import { fullDate, money, percent } from "@/lib/format";
+import type { HistoryRange } from "@/lib/market/types";
+import { concentration } from "@/lib/portfolio/allocation";
+import { basketSeries } from "@/lib/portfolio/backtest";
+import { buildPositions, portfolioTotals } from "@/lib/portfolio/positions";
+import { RANGES, useHistory } from "@/lib/portfolio/use-history";
+import { useMarketData } from "@/lib/portfolio/use-market-data";
 import { usePortfolioStore } from "@/lib/store/portfolio";
 import { usePortfolioHydrated } from "@/lib/store/use-portfolio-hydrated";
-import {
-  byAccount,
-  byAssetClass,
-  byCurrency,
-  byGeography,
-  byIndustry,
-  bySector,
-  portfolioTotals,
-  sliceDetailLinesForAccount,
-  sliceDetailLinesForAssetClass,
-  sliceDetailLinesForCurrency,
-  sliceDetailLinesForGeography,
-  sliceDetailLinesForIndustry,
-  sliceDetailLinesForSector,
-  topHoldings,
-} from "@/lib/portfolio/aggregations";
-import { portfolioDataQuality } from "@/lib/portfolio/data-quality";
-import { loadEtfLookthrough } from "@/lib/portfolio/etf-lookthrough";
-import { useEnrichment } from "@/lib/portfolio/use-enrichment";
 
 export default function DashboardPage() {
   const holdings = usePortfolioStore((s) => s.holdings);
   const snapshotDate = usePortfolioStore((s) => s.snapshotDate);
+  const fileName = usePortfolioStore((s) => s.fileName);
+  const clear = usePortfolioStore((s) => s.clear);
   const router = useRouter();
   const hydrated = usePortfolioHydrated();
-  const [accountFilter, setAccountFilter] = useState<string>(ALL_ACCOUNTS);
+
+  const [account, setAccount] = useState(ALL_ACCOUNTS);
+  const [range, setRange] = useState<HistoryRange>("1Y");
+  const [showBenchmark, setShowBenchmark] = useState(true);
 
   useEffect(() => {
-    if (!hydrated) return;
-    if (!holdings) router.replace("/");
+    if (hydrated && !holdings) router.replace("/");
   }, [holdings, hydrated, router]);
 
-  const { map: enrichment, status: enrichmentStatus } =
-    useEnrichment(holdings);
-  const etfLookthrough = useMemo(() => loadEtfLookthrough(), []);
-
-  const filtered = useMemo(() => {
+  const market = useMarketData(holdings);
+  const filteredRows = useMemo(() => {
     if (!holdings) return null;
-    if (accountFilter === ALL_ACCOUNTS) return holdings;
-    return holdings.filter((r) => r.accountType === accountFilter);
-  }, [holdings, accountFilter]);
+    return account === ALL_ACCOUNTS
+      ? holdings
+      : holdings.filter((r) => r.accountType === account);
+  }, [holdings, account]);
 
-  const data = useMemo(() => {
-    if (!filtered) return null;
-    return {
-      totals: portfolioTotals(filtered),
-      sector: bySector(filtered, enrichment, etfLookthrough).map((s) => ({
-        ...s,
-        tooltipLines: sliceDetailLinesForSector(
-          filtered,
-          s.label,
-          enrichment,
-          etfLookthrough,
-        ),
-      })),
-      industry: byIndustry(filtered, enrichment).map((s) => ({
-        ...s,
-        tooltipLines: sliceDetailLinesForIndustry(
-          filtered,
-          s.label,
-          enrichment,
-        ),
-      })),
-      assetClass: byAssetClass(filtered).map((s) => ({
-        ...s,
-        tooltipLines: sliceDetailLinesForAssetClass(filtered, s.label),
-      })),
-      geography: byGeography(filtered).map((s) => ({
-        ...s,
-        tooltipLines: sliceDetailLinesForGeography(filtered, s.label),
-      })),
-      currency: byCurrency(filtered).map((s) => ({
-        ...s,
-        tooltipLines: sliceDetailLinesForCurrency(filtered, s.label),
-      })),
-      account: byAccount(filtered).map((s) => ({
-        ...s,
-        tooltipLines: sliceDetailLinesForAccount(filtered, s.label),
-      })),
-      top: topHoldings(filtered, enrichment, 25),
-    };
-  }, [filtered, enrichment, etfLookthrough]);
+  const history = useHistory(filteredRows, range);
 
-  const quality = useMemo(() => {
-    if (!filtered) return null;
-    return portfolioDataQuality(filtered, enrichment, etfLookthrough);
-  }, [filtered, enrichment, etfLookthrough]);
+  const positions = useMemo(() => {
+    if (!filteredRows) return [];
+    return buildPositions({
+      rows: filteredRows,
+      quotes: market.quotes,
+      profiles: market.profiles,
+      usdCad: market.usdCad,
+    });
+  }, [filteredRows, market.quotes, market.profiles, market.usdCad]);
+
+  const totals = useMemo(() => portfolioTotals(positions), [positions]);
+  const series = useMemo(
+    () => (history.data ? basketSeries(positions, history.data) : null),
+    [positions, history.data],
+  );
 
   if (!hydrated) {
     return (
-      <main className="mx-auto max-w-6xl px-6 py-12 sm:px-8">
-        <p className="text-sm text-muted-foreground">Loading your session…</p>
+      <main className="mx-auto max-w-[88rem] px-4 py-16 sm:px-6">
+        <p className="label">Reading session…</p>
       </main>
     );
   }
-
-  if (!holdings || !filtered || !data || !quality) return null;
+  if (!holdings || !filteredRows) return null;
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12 sm:px-8">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
-          <DashboardBackHome className="sm:mt-1" />
-          <div className="min-w-0 flex-1 space-y-4">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <h1 className="font-serif text-4xl font-bold tracking-tight text-[var(--ws-black)]">
-                Your portfolio
-              </h1>
-              <div className="flex flex-wrap items-center gap-3">
-                <ReplaceCsvButton />
-                <AccountFilter
-                  rows={holdings}
-                  value={accountFilter}
-                  onChange={setAccountFilter}
-                />
-              </div>
-            </div>
-            <DataQualityStrip
-              enrichmentStatus={enrichmentStatus}
-              quality={quality}
-            />
+    <main className="mx-auto max-w-[88rem] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            aria-label="Back to import"
+            className="flex size-8 items-center justify-center border border-rule bg-panel text-ink-2 transition-colors hover:border-ink hover:text-ink"
+          >
+            <ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />
+          </Link>
+          <div>
+            <h1 className="text-sm font-semibold tracking-tight">
+              Portfolio Engine
+            </h1>
+            <p className="num mt-0.5 text-[11px] text-ink-3">
+              {fileName ?? "holdings"}
+              {snapshotDate ? ` · export as of ${fullDate(snapshotDate)}` : ""}
+            </p>
           </div>
         </div>
-      </div>
-
-      <div className="mt-8">
-        <StatTiles totals={data.totals} snapshotDate={snapshotDate} />
-      </div>
-
-      <div className="mt-10 grid min-w-0 gap-6 lg:grid-cols-2">
-        <ChartCard title="By sector">
-          <SectorDonut slices={data.sector} />
-        </ChartCard>
-        <ChartCard title="By industry">
-          <IndustryTreemap slices={data.industry} />
-        </ChartCard>
-        <ChartCard title="By asset class">
-          <AssetClassDonut slices={data.assetClass} />
-        </ChartCard>
-        <ChartCard title="By geography">
-          <GeographyDonut slices={data.geography} />
-        </ChartCard>
-        <ChartCard title="By currency">
-          <CurrencyDonut slices={data.currency} />
-        </ChartCard>
-        <ChartCard title="By account">
-          <AccountTypeBar slices={data.account} />
-        </ChartCard>
-      </div>
-
-      <div className="mt-10">
-        <h2 className="font-serif text-2xl font-semibold tracking-tight text-[var(--ws-black)]">
-          Top holdings
-        </h2>
-        <div className="mt-4">
-          <HoldingsTable rows={data.top} />
+        <div className="flex flex-wrap items-center gap-2">
+          <AccountFilter rows={holdings} value={account} onChange={setAccount} />
+          <button
+            type="button"
+            onClick={() => {
+              clear();
+              router.push("/");
+            }}
+            className="num border border-rule bg-panel px-2.5 py-1.5 text-[11px] font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
+          >
+            Replace csv
+          </button>
         </div>
       </div>
-    </main>
-  );
-}
 
-function ChartCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <Card className="pressable-surface min-w-0 border border-border/70 ring-0">
-      <CardHeader>
-        <CardTitle className="font-serif text-xl font-semibold tracking-tight text-[var(--ws-black)]">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="min-w-0">{children}</CardContent>
-    </Card>
+      <div className="mt-4">
+        <DataBar
+          positions={positions}
+          usdCad={market.usdCad}
+          asOf={market.asOf}
+          quoteStatus={market.quoteStatus}
+          profileStatus={market.profileStatus}
+          onRefresh={market.refresh}
+        />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
+        <Panel title="Market value" meta="CAD">
+          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+            <p
+              className="text-[clamp(2.75rem,7vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.045em]"
+              style={{ fontVariantNumeric: "proportional-nums" }}
+            >
+              {money(totals.valueCad)}
+            </p>
+            <div className="pb-1.5">
+              <p className="label mb-1.5">Today</p>
+              <Delta
+                value={totals.dayChangeCad}
+                percent={totals.dayChangePercent}
+                size="lg"
+              />
+            </div>
+          </div>
+          <div className="mt-7">
+            <ValueScale
+              marketValue={totals.valueCad}
+              bookValue={totals.bookValueCad}
+            />
+          </div>
+        </Panel>
+
+        <Panel title="Shape">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-5">
+            <Field label="Positions" value={totals.positions} />
+            <Field label="Securities" value={totals.securities} />
+            <Field
+              label="Top 5 weight"
+              value={percent(concentration(positions, 5), 0)}
+              hint="of market value"
+            />
+            <Field
+              label="Largest"
+              value={
+                [...positions].sort((a, b) => b.valueCad - a.valueCad)[0]
+                  ?.symbol ?? "—"
+              }
+              hint={percent(concentration(positions, 1), 1)}
+            />
+          </dl>
+        </Panel>
+      </div>
+
+      <div className="mt-4">
+        <Panel
+          title="Basket over time"
+          meta={
+            series
+              ? series.coverage < 99.5
+                ? `${percent(series.coverage, 0)} of value priced`
+                : undefined
+              : undefined
+          }
+          actions={
+            <div className="flex flex-wrap items-center gap-2">
+              <Toggle checked={showBenchmark} onChange={setShowBenchmark}>
+                S&P 500
+              </Toggle>
+              <Segmented
+                label="Time range"
+                value={range}
+                onChange={setRange}
+                options={RANGES.map((r) => ({ value: r, label: r }))}
+              />
+            </div>
+          }
+        >
+          {series ? (
+            <>
+              <BasketChart
+                series={series}
+                showBenchmark={showBenchmark}
+                dimmed={history.status === "loading"}
+              />
+              <p className="mt-4 border-t border-rule pt-3 text-xs leading-relaxed text-ink-2">
+                Today&rsquo;s share counts priced at historical closes, converted
+                at the rate on each day. The export carries no transactions, so
+                this is what the current basket would have been worth — not what
+                the account did.
+                {series.missing.length > 0
+                  ? ` ${series.missing.length} ${series.missing.length === 1 ? "holding has" : "holdings have"} no price history and sit outside the line.`
+                  : ""}
+              </p>
+            </>
+          ) : (
+            <p className="py-16 text-center text-sm text-ink-2">
+              {history.status === "error"
+                ? "Price history could not be loaded."
+                : "Loading price history…"}
+            </p>
+          )}
+        </Panel>
+      </div>
+
+      <div className="mt-4">
+        <AllocationPanel positions={positions} />
+      </div>
+
+      <div className="mt-4">
+        <Panel
+          title="Holdings"
+          meta={`${positions.length} ${positions.length === 1 ? "position" : "positions"}`}
+          flush
+        >
+          <HoldingsTable positions={positions} />
+        </Panel>
+      </div>
+    </main>
   );
 }

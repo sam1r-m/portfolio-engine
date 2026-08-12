@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePortfolioStore } from "@/lib/store/portfolio";
 
-/** Runs `persist.rehydrate()` once on the client (see `skipHydration` on the store). */
+/** The store sets skipHydration, so the client kicks it off here. */
 export function PortfolioRehydrate() {
   useEffect(() => {
     void usePortfolioStore.persist.rehydrate();

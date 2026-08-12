@@ -98,7 +98,12 @@ export function fundRegion(
   const name = (fundName ?? "").toLowerCase();
   if (!name) return UNCLASSIFIED;
   if (/emerging/.test(name)) return "Emerging markets";
-  if (/all[- ]?equity|all[- ]?world|total world|global|acwi|growth etf portfolio|balanced etf portfolio/.test(name))
+  // VEQT, XEQT, XGRO and the rest of the all-in-one family are world baskets.
+  if (
+    /all[- ]?equity|all[- ]?world|total world|global|acwi|(equity|growth|balanced|conservative|income)\s+etf portfolio/.test(
+      name,
+    )
+  )
     return "Global";
   if (/eafe|ex[- ]north america|ex[- ]canada|developed ex|international|europe|japan/.test(name))
     return "International developed";
