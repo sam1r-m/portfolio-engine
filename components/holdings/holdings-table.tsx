@@ -102,7 +102,7 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
                       : "none"
                   }
                   className={cn(
-                    "px-4 py-2.5 sm:px-5",
+                    "whitespace-nowrap px-3 py-2.5 sm:px-5",
                     col.align === "right" ? "text-right" : "text-left",
                     col.hideBelow && HIDE_CLASS[col.hideBelow],
                   )}
@@ -138,7 +138,7 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
                 key={p.key}
                 className="border-b border-rule/70 transition-colors last:border-b-0 hover:bg-panel-sunk"
               >
-                <td className="px-4 py-2.5 sm:px-5">
+                <td className="w-full px-3 py-2.5 sm:px-5">
                   <div className="flex items-baseline gap-2">
                     <span className="num text-sm font-medium">{p.symbol}</span>
                     {!p.livePrice ? (
@@ -151,18 +151,18 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
                     ) : null}
                   </div>
                   <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-xs text-ink-2">
-                    <span className="truncate">{p.name}</span>
-                    <span className="num text-[10px] text-ink-3">
+                    <span>{p.name}</span>
+                    <span className="num hidden text-[10px] text-ink-3 sm:inline">
                       {quantity(p.quantity)} @ {p.price.toFixed(2)} {p.currency}
                     </span>
                   </div>
                 </td>
-                <td className="num px-4 py-2.5 text-right text-sm tabular-nums sm:px-5">
+                <td className="num whitespace-nowrap px-3 py-2.5 text-right text-sm tabular-nums sm:px-5">
                   {money(p.valueCad)}
                 </td>
                 <td
                   className={cn(
-                    "px-4 py-2.5 text-right sm:px-5",
+                    "whitespace-nowrap px-3 py-2.5 text-right sm:px-5",
                     HIDE_CLASS.md,
                   )}
                 >
@@ -179,18 +179,23 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
                 </td>
                 <td
                   className={cn(
-                    "px-4 py-2.5 text-right sm:px-5",
+                    "whitespace-nowrap px-3 py-2.5 text-right sm:px-5",
                     HIDE_CLASS.sm,
                   )}
                 >
                   <Delta percent={p.dayChangePercent} showIcon={false} />
                 </td>
-                <td className="px-4 py-2.5 text-right sm:px-5">
-                  <Delta value={p.gainCad} percent={p.gainPercent} showIcon={false} />
+                <td className="whitespace-nowrap px-3 py-2.5 text-right sm:px-5">
+                  <Delta
+                    value={p.gainCad}
+                    percent={p.gainPercent}
+                    showIcon={false}
+                    hidePercentOnSmall
+                  />
                 </td>
                 <td
                   className={cn(
-                    "px-4 py-2.5 text-xs text-ink-2 sm:px-5",
+                    "whitespace-nowrap px-3 py-2.5 text-xs text-ink-2 sm:px-5",
                     HIDE_CLASS.lg,
                   )}
                 >

@@ -22,6 +22,35 @@ export interface MarketData {
   refresh: () => void;
 }
 
+/** Results carry the request they answered, so status is derived, not set. */
+interface Slot<T> {
+  request: string;
+  data: T;
+  failed: boolean;
+}
+
+const EMPTY_QUOTES: Slot<{
+  quotes: Record<string, Quote>;
+  usdCad: number | null;
+  asOf: string | null;
+}> = {
+  request: "",
+  data: { quotes: {}, usdCad: null, asOf: null },
+  failed: false,
+};
+
+const EMPTY_PROFILES: Slot<Record<string, Profile>> = {
+  request: "",
+  data: {},
+  failed: false,
+};
+
+function statusOf(slot: Slot<unknown>, request: string): FetchStatus {
+  if (!request) return "idle";
+  if (slot.request !== request) return "loading";
+  return slot.failed ? "error" : "ready";
+}
+
 async function post<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
@@ -34,63 +63,65 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 
 export function useMarketData(rows: HoldingRow[] | null): MarketData {
   const symbols = useMemo(() => (rows ? symbolRefs(rows) : []), [rows]);
-  // Refetch when the set of tickers changes, not when the rows array is rebuilt.
-  const fingerprint = useMemo(
-    () =>
-      symbols
-        .map((s) => `${s.symbol}|${s.mic}`)
-        .sort()
-        .join(","),
-    [symbols],
-  );
-
   const [nonce, setNonce] = useState(0);
-  const [quotes, setQuotes] = useState<Record<string, Quote>>({});
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
-  const [usdCad, setUsdCad] = useState<number | null>(null);
-  const [asOf, setAsOf] = useState<string | null>(null);
-  const [quoteStatus, setQuoteStatus] = useState<FetchStatus>("idle");
-  const [profileStatus, setProfileStatus] = useState<FetchStatus>("idle");
+
+  // Keyed on the set of tickers, not the rows array, so rebuilding the rows
+  // does not refetch. The nonce is what a manual refresh moves.
+  const request = useMemo(() => {
+    const fingerprint = symbols
+      .map((s) => `${s.symbol}|${s.mic}`)
+      .sort()
+      .join(",");
+    return fingerprint ? `${nonce}::${fingerprint}` : "";
+  }, [symbols, nonce]);
+
+  const [quoteSlot, setQuoteSlot] = useState(EMPTY_QUOTES);
+  const [profileSlot, setProfileSlot] = useState(EMPTY_PROFILES);
 
   useEffect(() => {
-    if (!fingerprint) return;
+    if (!request) return;
     let cancelled = false;
-    setQuoteStatus("loading");
-    setProfileStatus("loading");
 
     post<QuotesResponse>("/api/quotes", { symbols })
-      .then((data) => {
+      .then((res) => {
         if (cancelled) return;
-        setQuotes(data.quotes);
-        setUsdCad(data.usdCad);
-        setAsOf(data.asOf);
-        setQuoteStatus("ready");
+        setQuoteSlot({
+          request,
+          failed: false,
+          data: { quotes: res.quotes, usdCad: res.usdCad, asOf: res.asOf },
+        });
       })
-      .catch(() => !cancelled && setQuoteStatus("error"));
+      .catch(() => {
+        if (!cancelled) setQuoteSlot({ ...EMPTY_QUOTES, request, failed: true });
+      });
 
     post<ProfilesResponse>("/api/profiles", { symbols })
-      .then((data) => {
-        if (cancelled) return;
-        setProfiles(data.profiles);
-        setProfileStatus("ready");
+      .then((res) => {
+        if (!cancelled) {
+          setProfileSlot({ request, failed: false, data: res.profiles });
+        }
       })
-      .catch(() => !cancelled && setProfileStatus("error"));
+      .catch(() => {
+        if (!cancelled) {
+          setProfileSlot({ ...EMPTY_PROFILES, request, failed: true });
+        }
+      });
 
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fingerprint, nonce]);
+  }, [request]);
 
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
 
   return {
-    quotes,
-    profiles,
-    usdCad,
-    asOf,
-    quoteStatus,
-    profileStatus,
+    quotes: quoteSlot.data.quotes,
+    profiles: profileSlot.data,
+    usdCad: quoteSlot.data.usdCad,
+    asOf: quoteSlot.data.asOf,
+    quoteStatus: statusOf(quoteSlot, request),
+    profileStatus: statusOf(profileSlot, request),
     refresh,
   };
 }

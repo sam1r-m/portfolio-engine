@@ -94,12 +94,15 @@ export function Delta({
   percent,
   size = "sm",
   showIcon = true,
+  hidePercentOnSmall,
 }: {
   /** Absolute change in CAD. Omit to show the percent alone. */
   value?: number;
   percent: number | null;
   size?: "sm" | "lg";
   showIcon?: boolean;
+  /** Drops the percent on narrow screens where the column cannot hold both. */
+  hidePercentOnSmall?: boolean;
 }) {
   if (percent === null) {
     return <span className="num text-ink-3">—</span>;
@@ -124,8 +127,13 @@ export function Delta({
         />
       ) : null}
       {value !== undefined ? <span>{signedMoney(value)}</span> : null}
-      <span className={value !== undefined ? "text-[0.85em] opacity-80" : ""}>
-        {signedPercent(percent, size === "lg" ? 2 : 2)}
+      <span
+        className={cn(
+          value !== undefined && "text-[0.85em] opacity-80",
+          hidePercentOnSmall && "hidden sm:inline",
+        )}
+      >
+        {signedPercent(percent)}
       </span>
     </span>
   );

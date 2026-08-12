@@ -8,35 +8,35 @@ import type { FetchStatus } from "./use-market-data";
 
 export const RANGES: HistoryRange[] = ["1M", "3M", "6M", "1Y", "5Y", "MAX"];
 
+interface Slot {
+  request: string;
+  data: HistoryResponse | null;
+}
+
 export function useHistory(rows: HoldingRow[] | null, range: HistoryRange) {
   const symbols = useMemo(() => (rows ? symbolRefs(rows) : []), [rows]);
-  const fingerprint = useMemo(
-    () =>
-      symbols
-        .map((s) => `${s.symbol}|${s.mic}`)
-        .sort()
-        .join(","),
-    [symbols],
-  );
+  const request = useMemo(() => {
+    const fingerprint = symbols
+      .map((s) => `${s.symbol}|${s.mic}`)
+      .sort()
+      .join(",");
+    return fingerprint ? `${range}::${fingerprint}` : "";
+  }, [symbols, range]);
 
-  const [data, setData] = useState<HistoryResponse | null>(null);
-  const [status, setStatus] = useState<FetchStatus>("idle");
-  // Held so a range switch keeps the previous line on screen instead of
-  // collapsing the chart to a skeleton.
+  const [slot, setSlot] = useState<Slot>({ request: "", data: null });
+  // Ranges already fetched stay in hand so switching back is instant and the
+  // chart never collapses to a skeleton.
   const cache = useRef(new Map<string, HistoryResponse>());
 
   useEffect(() => {
-    if (!fingerprint) return;
-    const cacheKey = `${range}::${fingerprint}`;
-    const hit = cache.current.get(cacheKey);
+    if (!request) return;
+    const hit = cache.current.get(request);
     if (hit) {
-      setData(hit);
-      setStatus("ready");
+      setSlot({ request, data: hit });
       return;
     }
 
     let cancelled = false;
-    setStatus("loading");
     fetch("/api/history", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -48,19 +48,27 @@ export function useHistory(rows: HoldingRow[] | null, range: HistoryRange) {
       })
       .then((json) => {
         if (cancelled) return;
-        cache.current.set(cacheKey, json);
-        setData(json);
-        setStatus("ready");
+        cache.current.set(request, json);
+        setSlot({ request, data: json });
       })
       .catch(() => {
-        if (!cancelled) setStatus("error");
+        if (!cancelled) setSlot({ request, data: null });
       });
 
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fingerprint, range]);
+  }, [request]);
 
-  return { data, status };
+  const status: FetchStatus = !request
+    ? "idle"
+    : slot.request !== request
+      ? "loading"
+      : slot.data
+        ? "ready"
+        : "error";
+
+  // Hold the previous range's line while the next one loads.
+  return { data: slot.data, status };
 }

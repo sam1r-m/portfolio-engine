@@ -136,20 +136,7 @@
   font-feature-settings: "zero" 1;
 }
 
-/* Corner ticks: the instrument's registration marks. */
-@utility ticked {
-  position: relative;
-}
-
-@utility panel {
-  background: var(--panel);
-  border: 1px solid var(--rule);
-}
-
-/*
-  Fixed 3px hatch, drawn once. Marks any figure the export could not price so
-  a reconstructed number never passes for a measured one.
-*/
+/* Marks a bucket the data could not classify, so a gap never reads as a value. */
 @utility hatched {
   background-image: repeating-linear-gradient(
     135deg,
