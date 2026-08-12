@@ -10,9 +10,12 @@ const MIC_SUFFIX: Record<string, string> = {
   AEQL: ".NE",
 };
 
-/** Yahoo tags non-US listings with an exchange suffix; US tickers stay bare. */
+/**
+ * Yahoo tags non-US listings with an exchange suffix and writes share classes
+ * with a dash where the export uses a dot (BRK.B → BRK-B, CTC.A → CTC-A.TO).
+ */
 export function yahooSymbol(symbol: string, mic: string): string {
-  const base = symbol.replace(/\s+/g, "-").toUpperCase();
+  const base = symbol.trim().toUpperCase().replace(/[\s.]+/g, "-");
   const suffix = MIC_SUFFIX[mic];
   return suffix ? `${base}${suffix}` : base;
 }

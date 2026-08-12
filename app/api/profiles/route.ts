@@ -8,6 +8,7 @@ import {
 } from "@/lib/market/taxonomy";
 import type { EtfProfile, Profile, ProfilesResponse } from "@/lib/market/types";
 import {
+  LENIENT,
   SymbolsBodySchema,
   dedupe,
   inBatches,
@@ -19,6 +20,24 @@ export const runtime = "nodejs";
 const MODULES = ["assetProfile", "topHoldings", "fundProfile", "price"] as const;
 
 type SectorWeighting = Record<string, number | undefined>;
+
+/** Only the slice of the quoteSummary payload this route reads. */
+interface SummaryShape {
+  assetProfile?: { sector?: string; industry?: string; country?: string };
+  fundProfile?: { categoryName?: string | null; family?: string | null };
+  price?: { longName?: string | null; shortName?: string | null };
+  topHoldings?: {
+    sectorWeightings?: SectorWeighting[];
+    holdings?: Array<{
+      symbol?: string;
+      holdingName?: string;
+      holdingPercent?: number;
+    }>;
+    stockPosition?: number;
+    bondPosition?: number;
+    cashPosition?: number;
+  };
+}
 
 function toSectorWeights(raw: SectorWeighting[] | undefined) {
   const out: Record<string, number> = {};
@@ -46,9 +65,11 @@ export async function POST(req: Request) {
   await inBatches(refs, 8, async (ref) => {
     const key = securityKey(ref.symbol, ref.mic);
     try {
-      const r = await yf.quoteSummary(yahooSymbol(ref.symbol, ref.mic), {
-        modules: [...MODULES],
-      });
+      const r = (await yf.quoteSummary(
+        yahooSymbol(ref.symbol, ref.mic),
+        { modules: [...MODULES] },
+        LENIENT,
+      )) as SummaryShape;
       const top = r.topHoldings;
       const isFund = Boolean(top);
       const fundName = r.price?.longName ?? r.price?.shortName ?? null;
@@ -57,9 +78,7 @@ export async function POST(req: Request) {
         ? {
             category: r.fundProfile?.categoryName ?? null,
             family: r.fundProfile?.family ?? null,
-            sectorWeights: toSectorWeights(
-              top.sectorWeightings as SectorWeighting[] | undefined,
-            ),
+            sectorWeights: toSectorWeights(top.sectorWeightings),
             holdings: (top.holdings ?? [])
               .filter((h) => typeof h.holdingPercent === "number")
               .map((h) => ({

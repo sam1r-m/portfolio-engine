@@ -55,8 +55,18 @@ const dayMonthYear = new Intl.DateTimeFormat("en-CA", {
   year: "numeric",
 });
 
+const monthYear = new Intl.DateTimeFormat("en-CA", {
+  month: "short",
+  year: "2-digit",
+});
+
 export function shortDate(ts: number | Date): string {
   return dayMonth.format(ts);
+}
+
+/** Drops the day and adds the year once a range runs past a few months. */
+export function axisDate(ts: number, spanDays: number): string {
+  return spanDays > 200 ? monthYear.format(ts) : dayMonth.format(ts);
 }
 
 export function fullDate(ts: number | Date): string {

@@ -8,6 +8,13 @@ export const yf = new YahooFinance({
   validation: { logErrors: false },
 });
 
+/**
+ * Yahoo drifts from its own schema constantly, and a strict batch throws
+ * wholesale rather than dropping the one row that broke. Every call here opts
+ * out so a single odd ticker cannot blank the page.
+ */
+export const LENIENT = { validateResult: false } as const;
+
 export const SymbolRefSchema = z.object({
   symbol: z.string().min(1).max(16),
   mic: z.string().max(8).optional().default(""),
@@ -41,7 +48,7 @@ const FX_PAIR = "USDCAD=X";
 /** CAD per USD. Falls back to the last close if the live quote is unavailable. */
 export async function usdCadRate(): Promise<number | null> {
   try {
-    const q = await yf.quote(FX_PAIR);
+    const q = await yf.quote(FX_PAIR, {}, LENIENT);
     const rate = q?.regularMarketPrice ?? q?.regularMarketPreviousClose;
     return typeof rate === "number" && rate > 0 ? rate : null;
   } catch {

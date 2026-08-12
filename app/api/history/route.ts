@@ -3,6 +3,7 @@ import { z } from "zod";
 import { securityKey, yahooSymbol } from "@/lib/market/symbols";
 import type { HistoryRange, HistoryResponse } from "@/lib/market/types";
 import {
+  LENIENT,
   SymbolRefSchema,
   dedupe,
   inBatches,
@@ -36,13 +37,23 @@ function periodStart(range: HistoryRange): Date {
 
 type Series = Map<number, number>;
 
+/** Only the slice of the chart payload this route reads. */
+interface ChartShape {
+  meta: { currency?: string | null };
+  quotes: Array<{ date?: Date | null; close?: number | null }>;
+}
+
 async function closeSeries(
   symbol: string,
   period1: Date,
   interval: "1d" | "1wk",
 ): Promise<{ series: Series; currency: string } | null> {
   try {
-    const chart = await yf.chart(symbol, { period1, interval });
+    const chart = (await yf.chart(
+      symbol,
+      { period1, interval },
+      LENIENT,
+    )) as ChartShape;
     const series: Series = new Map();
     for (const q of chart.quotes) {
       // Split-adjusted close, which is what today's share count needs. Rows are

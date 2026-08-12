@@ -24,7 +24,7 @@ export default function Home() {
         </header>
 
         <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-          <div className="border-b border-rule px-5 py-8 sm:px-7 sm:py-10 lg:border-b-0 lg:border-r">
+          <div className="flex flex-col justify-center border-b border-rule px-5 py-8 sm:px-7 sm:py-10 lg:border-b-0 lg:border-r">
             <p className="max-w-[46ch] text-[1.35rem] leading-[1.35] tracking-[-0.02em] sm:text-[1.6rem]">
               The export tells you what you own. This tells you what you are
               actually holding — after the funds are dissolved into their real

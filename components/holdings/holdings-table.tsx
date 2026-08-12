@@ -23,7 +23,7 @@ const COLUMNS: Array<{
 }> = [
   { key: "symbol", label: "Holding", align: "left" },
   { key: "valueCad", label: "Value", align: "right" },
-  { key: "weight", label: "Weight", align: "right" },
+  { key: "weight", label: "Weight", align: "right", hideBelow: "md" },
   { key: "dayChangePercent", label: "Today", align: "right", hideBelow: "sm" },
   { key: "gainCad", label: "Unrealized", align: "right" },
   { key: "sector", label: "Sector", align: "left", hideBelow: "lg" },
@@ -80,7 +80,7 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[36rem] border-collapse">
+      <table className="w-full border-collapse sm:min-w-[40rem]">
         <thead>
           <tr className="border-b border-rule">
             {COLUMNS.map((col) => {
@@ -160,7 +160,12 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
                 <td className="num px-4 py-2.5 text-right text-sm tabular-nums sm:px-5">
                   {money(p.valueCad)}
                 </td>
-                <td className="px-4 py-2.5 text-right sm:px-5">
+                <td
+                  className={cn(
+                    "px-4 py-2.5 text-right sm:px-5",
+                    HIDE_CLASS.md,
+                  )}
+                >
                   <span className="num text-sm tabular-nums">
                     {percent(weight)}
                   </span>
@@ -190,15 +195,12 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
                   )}
                 >
                   <span className="block">{p.sector}</span>
-                  {p.marketCapCad ? (
-                    <span className="num mt-0.5 block text-[10px] text-ink-3">
-                      {p.capBucket} · {compactMoney(p.marketCapCad)}
-                    </span>
-                  ) : (
+                  {p.capBucket !== p.sector ? (
                     <span className="num mt-0.5 block text-[10px] text-ink-3">
                       {p.capBucket}
+                      {p.marketCapCad ? ` · ${compactMoney(p.marketCapCad)}` : ""}
                     </span>
-                  )}
+                  ) : null}
                 </td>
               </tr>
             );

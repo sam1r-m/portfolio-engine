@@ -8,11 +8,43 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { fps, frames } from "@/lib/data/ascii-coin-frames.js";
+import { fps, frames as rawFrames } from "@/lib/data/ascii-coin-frames.js";
 import { cn } from "@/lib/utils";
 
 /** >1 plays faster than the export’s nominal fps. */
 const PLAYBACK_SPEED = 1.3;
+
+/**
+ * The export pads every frame out to a fixed canvas, so a third of the box is
+ * blank. Crop to the tightest window that holds the art in any frame — the
+ * same crop for all of them, or the coin would jitter.
+ */
+const frames: string[] = (() => {
+  const all: string[][] = rawFrames.map((f: string) => f.split("\n"));
+  let left = Infinity;
+  let right = 0;
+  let top = Infinity;
+  let bottom = 0;
+
+  for (const lines of all) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line.trim()) continue;
+      top = Math.min(top, i);
+      bottom = Math.max(bottom, i);
+      left = Math.min(left, line.length - line.trimStart().length);
+      right = Math.max(right, line.trimEnd().length);
+    }
+  }
+  if (!Number.isFinite(left) || !Number.isFinite(top)) return rawFrames;
+
+  return all.map((lines) =>
+    lines
+      .slice(top, bottom + 1)
+      .map((line) => line.slice(left, right).trimEnd())
+      .join("\n"),
+  );
+})();
 
 const isNarrowViewport = () =>
   typeof window !== "undefined" &&
@@ -60,9 +92,10 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     const ph = pre.offsetHeight;
     if (pw < 1 || ph < 1) return;
 
-    const fit = cw / pw;
-    const maxScale = isNarrowViewport() ? 1.35 : 2.4;
-    const s = Math.min(fit, maxScale);
+    // Bound by height as well as width; the frames are taller than they
+    // are wide, so fitting the column alone runs the coin off the fold.
+    const narrow = isNarrowViewport();
+    const s = Math.min(cw / pw, (narrow ? 340 : 620) / ph, narrow ? 1.35 : 2.4);
     inner.style.transform = `scale(${s})`;
     inner.style.transformOrigin = "top left";
 

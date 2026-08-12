@@ -1,4 +1,4 @@
-import { UNCLASSIFIED } from "@/lib/market/taxonomy";
+import { CAP_BUCKETS, UNCLASSIFIED } from "@/lib/market/taxonomy";
 import type { Position } from "./positions";
 
 export type DimensionId =
@@ -15,11 +15,13 @@ export interface Dimension {
   label: string;
   /** ETF sector weights can dissolve a fund across this dimension. */
   supportsLookthrough: boolean;
+  /** Ordered scales keep their own order; everything else sorts by value. */
+  scale?: readonly string[];
 }
 
 export const DIMENSIONS: Dimension[] = [
   { id: "sector", label: "Sector", supportsLookthrough: true },
-  { id: "cap", label: "Cap size", supportsLookthrough: false },
+  { id: "cap", label: "Cap size", supportsLookthrough: false, scale: CAP_BUCKETS },
   { id: "region", label: "Region", supportsLookthrough: false },
   { id: "assetClass", label: "Asset class", supportsLookthrough: false },
   { id: "industry", label: "Industry", supportsLookthrough: false },
@@ -142,10 +144,13 @@ export function allocate(
     b.constituents.sort((a, c) => c.valueCad - a.valueCad);
   }
 
+  const scale = DIMENSIONS.find((d) => d.id === dimension)?.scale;
+
   // Unclassified always sinks to the bottom; it is a gap, not a holding.
   return out.sort((a, b) => {
     if (a.label === UNCLASSIFIED) return 1;
     if (b.label === UNCLASSIFIED) return -1;
+    if (scale) return scale.indexOf(a.label) - scale.indexOf(b.label);
     return b.valueCad - a.valueCad;
   });
 }

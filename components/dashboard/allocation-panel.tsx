@@ -68,7 +68,6 @@ export function AllocationPanel({ positions }: { positions: Position[] }) {
           <Row
             key={bucket.label}
             bucket={bucket}
-            widest={buckets[0]?.percent || 1}
             expanded={open.includes(bucket.label)}
             onToggle={() =>
               setOpen((o) =>
@@ -86,17 +85,14 @@ export function AllocationPanel({ positions }: { positions: Position[] }) {
 
 function Row({
   bucket,
-  widest,
   expanded,
   onToggle,
 }: {
   bucket: AllocationBucket;
-  widest: number;
   expanded: boolean;
   onToggle: () => void;
 }) {
   const unclassified = bucket.label === UNCLASSIFIED;
-  const barPct = (bucket.percent / widest) * 100;
   const bodyId = `alloc-${bucket.label.replace(/\W+/g, "-")}`;
 
   return (
@@ -133,10 +129,11 @@ function Row({
             )}
           />
         </div>
+        {/* Bar length is share of the portfolio, so the track reads as 100%. */}
         <div className="mt-2 h-1.5 w-full bg-panel-sunk group-hover:bg-white/70">
           <div
             className={cn("h-full", unclassified ? "hatched" : "bg-accent")}
-            style={{ width: `${Math.max(barPct, 0.6)}%` }}
+            style={{ width: `${Math.max(bucket.percent, 0.4)}%` }}
           />
         </div>
       </button>
@@ -185,9 +182,13 @@ function Row({
                       <span className="inline-flex items-center gap-2">
                         <span
                           aria-hidden
-                          className="hidden h-1 bg-accent/35 md:block"
-                          style={{ width: `${Math.max(share * 0.4, 1)}px` }}
-                        />
+                          className="hidden h-1 w-12 bg-rule md:block"
+                        >
+                          <span
+                            className="block h-full bg-accent/45"
+                            style={{ width: `${Math.max(share, 1.5)}%` }}
+                          />
+                        </span>
                         {percent(share)}
                       </span>
                     </td>

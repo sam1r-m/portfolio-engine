@@ -16,8 +16,7 @@
 
   --rule: #d8d9d6;
   --rule-strong: #b6b7b3;
-  --grid-fine: rgb(16 16 16 / 0.022);
-  --grid-coarse: rgb(16 16 16 / 0.05);
+  --rule-faint: rgb(16 16 16 / 0.055);
 
   --accent: #2340d8;
   --accent-ink: #1b33ab;
@@ -92,18 +91,14 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Ledger ruling on the type rhythm — the paper this gets read on. */
   body {
     background-color: var(--ground);
-    background-image:
-      linear-gradient(to right, var(--grid-coarse) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-coarse) 1px, transparent 1px),
-      linear-gradient(to right, var(--grid-fine) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-fine) 1px, transparent 1px);
-    background-size:
-      120px 120px,
-      120px 120px,
-      24px 24px,
-      24px 24px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--rule-faint) 0 1px,
+      transparent 1px 24px
+    );
     color: var(--ink);
     overflow-x: hidden;
     font-synthesis-weight: none;

@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { BasketSeries } from "@/lib/portfolio/backtest";
-import { compactMoney, fullDate, money, shortDate, signedPercent } from "@/lib/format";
+import { axisDate, compactMoney, fullDate, money, signedPercent } from "@/lib/format";
 import { useMeasure } from "@/lib/use-measure";
 import { cn } from "@/lib/utils";
 
@@ -89,6 +89,8 @@ export function BasketChart({
     activeStart === 0 ? 0 : ((activeValue - activeStart) / activeStart) * 100;
 
   const xLabelCount = width < 520 ? 3 : 5;
+  const spanDays =
+    (series.dates[series.dates.length - 1] - series.dates[0]) / 86_400_000;
   const xLabels = Array.from({ length: xLabelCount }, (_, k) => {
     const i = Math.round((k / (xLabelCount - 1)) * (series.dates.length - 1));
     return { i, ts: series.dates[i] };
@@ -224,7 +226,7 @@ export function BasketChart({
               fill="var(--ink-3)"
               textAnchor={k === 0 ? "start" : k === xLabels.length - 1 ? "end" : "middle"}
             >
-              {shortDate(ts)}
+              {axisDate(ts, spanDays)}
             </text>
           ))}
 
