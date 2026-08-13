@@ -31,7 +31,7 @@ export function DemoPortfolioPanel() {
         type="button"
         disabled={loading || fetching}
         onClick={() => void run()}
-        className="num border-b border-ink pb-0.5 text-xs font-medium tracking-wide text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+        className="ui border-b border-ink pb-0.5 text-xs font-semibold tracking-wide text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
       >
         {fetching || loading ? "Loading sample…" : "Load a sample portfolio"}
       </button>

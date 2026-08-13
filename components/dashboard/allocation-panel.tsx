@@ -57,8 +57,8 @@ export function AllocationPanel({ positions }: { positions: Position[] }) {
           </Toggle>
           <p className="text-xs text-ink-2">
             {lookthrough
-              ? `${fundsWithWeights} fund ${fundsWithWeights === 1 ? "position is" : "positions are"} dissolved into their published sector weights.`
-              : `${fundsWithWeights} fund ${fundsWithWeights === 1 ? "position sits" : "positions sit"} whole in one bucket.`}
+              ? `${fundsWithWeights} fund ${fundsWithWeights === 1 ? "position is" : "positions are"} split by the sectors they hold.`
+              : `${fundsWithWeights} fund ${fundsWithWeights === 1 ? "position counts" : "positions count"} as one line each.`}
           </p>
         </div>
       ) : null}
@@ -108,7 +108,7 @@ function Row({
         )}
       >
         <div className="flex items-baseline gap-3">
-          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+          <span className="min-w-0 flex-1 truncate text-[15px]">
             {bucket.label}
           </span>
           <span className="num hidden text-xs tabular-nums sm:block">
@@ -163,7 +163,7 @@ function Row({
                     className="border-b border-rule/70 last:border-b-0"
                   >
                     <td className="py-1.5 pr-3">
-                      <span className="num text-xs font-medium">
+                      <span className="num text-xs font-semibold">
                         {c.position.symbol}
                       </span>
                       <span className="ml-2 text-xs text-ink-2">

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useLoadHoldings } from "@/components/import/use-load-holdings";
 import { cn } from "@/lib/utils";
 
-/** Registration target — the file lands here. */
+/** Registration target. The file lands here. */
 function Crosshair({ active }: { active: boolean }) {
   return (
     <svg
@@ -71,11 +71,11 @@ export function Dropzone() {
         <Crosshair active={dragging} />
 
         <div>
-          <p className="text-base font-medium">
-            {loading ? "Parsing…" : "Drop the holdings csv"}
+          <p className="text-lg font-bold">
+            {loading ? "Reading the file…" : "Drop the holdings csv"}
           </p>
           <p className="mt-1.5 text-sm text-ink-2">
-            Parsed in this tab. Only ticker symbols ever reach the network.
+            It gets read here in the tab. Only the ticker symbols go anywhere.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export function Dropzone() {
           type="button"
           disabled={loading}
           onClick={() => inputRef.current?.click()}
-          className="num border border-ink bg-ink px-4 py-2 text-xs font-medium tracking-wide text-white transition-colors hover:bg-accent hover:border-accent disabled:opacity-50"
+          className="ui border border-ink bg-ink px-4 py-2 text-xs font-medium tracking-wide text-white transition-colors hover:border-accent hover:bg-accent disabled:opacity-50"
         >
           Choose file
         </button>
@@ -102,10 +102,10 @@ export function Dropzone() {
 
       {error ? (
         <div className="mt-3 border border-neg/40 bg-panel px-4 py-3">
-          <p className="text-sm font-medium text-neg">
-            That is not a Wealthsimple holdings report.
+          <p className="text-sm font-bold text-neg">
+            That file is not a Wealthsimple holdings report.
           </p>
-          <p className="num mt-1.5 text-xs leading-relaxed text-ink-2">{error}</p>
+          <p className="ui mt-1.5 text-xs leading-relaxed text-ink-2">{error}</p>
         </div>
       ) : null}
     </div>

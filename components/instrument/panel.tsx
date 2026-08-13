@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** Registration marks at the corners — the panel reads as a measured plate. */
+/** Registration marks at the corners, so the panel reads as a measured plate. */
 function CornerTicks() {
   return (
     <span aria-hidden className="pointer-events-none absolute inset-0">
@@ -35,7 +35,7 @@ export function Panel({
   children: ReactNode;
   className?: string;
   bodyClassName?: string;
-  /** Body sits edge to edge; use for tables and charts that own their padding. */
+  /** Body sits edge to edge, for tables and charts that own their padding. */
   flush?: boolean;
 }) {
   return (
@@ -46,7 +46,7 @@ export function Panel({
           <div className="flex items-baseline gap-3">
             {title ? <h2 className="label">{title}</h2> : null}
             {meta ? (
-              <span className="num text-[11px] text-ink-3">{meta}</span>
+              <span className="ui text-[11px] text-ink-3">{meta}</span>
             ) : null}
           </div>
           {actions ? (
@@ -77,14 +77,14 @@ export function Field({
       <span className="label">{label}</span>
       <span
         className={cn(
-          "num text-[15px] font-medium tabular-nums",
+          "readout text-[17px] leading-none",
           tone === "pos" && "text-pos",
           tone === "neg" && "text-neg",
         )}
       >
         {value}
       </span>
-      {hint ? <span className="num text-[11px] text-ink-3">{hint}</span> : null}
+      {hint ? <span className="ui text-[11px] text-ink-3">{hint}</span> : null}
     </div>
   );
 }

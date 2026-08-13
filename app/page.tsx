@@ -18,17 +18,17 @@ export default function Home() {
           <h1 className="text-sm font-semibold tracking-tight">
             Portfolio Engine
           </h1>
-          <p className="num text-[11px] text-ink-3">
-            Wealthsimple holdings report → live composition
+          <p className="ui text-[11px] text-ink-3">
+            Wealthsimple holdings report, priced today
           </p>
         </header>
 
         <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="flex flex-col justify-center border-b border-rule px-5 py-8 sm:px-7 sm:py-10 lg:border-b-0 lg:border-r">
             <p className="max-w-[46ch] text-[1.35rem] leading-[1.35] tracking-[-0.02em] sm:text-[1.6rem]">
-              The export tells you what you own. This tells you what you are
-              actually holding — after the funds are dissolved into their real
-              sector weights, at today&rsquo;s prices and today&rsquo;s rate.
+              Your export lists what you bought. This shows what you actually
+              hold, with every fund broken into the sectors it owns, priced at
+              today&rsquo;s close and converted at today&rsquo;s rate.
             </p>
 
             <div className="mt-9 space-y-4">
@@ -49,11 +49,11 @@ export default function Home() {
               key={step}
               className="border-b border-rule px-5 py-4 last:border-b-0 sm:px-7 sm:[&:nth-last-child(-n+2)]:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0"
             >
-              <span className="num text-[11px] font-medium text-accent">
+              <span className="ui text-[11px] font-semibold text-accent">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <p className="mt-1.5 text-sm font-medium">{step}</p>
-              <p className="mt-0.5 text-xs text-ink-2">{detail}</p>
+              <p className="mt-1.5 text-[15px]">{step}</p>
+              <p className="ui mt-1 text-xs text-ink-2">{detail}</p>
             </li>
           ))}
         </ol>

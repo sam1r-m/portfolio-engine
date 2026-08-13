@@ -23,8 +23,8 @@ export function Footer() {
           </a>
           .
         </p>
-        <p className="num text-[11px] text-ink-3">
-          Prices and classifications via Yahoo Finance. Not affiliated with
+        <p className="ui text-[11px] text-ink-3">
+          Prices and classifications from Yahoo Finance. Not affiliated with
           Wealthsimple.
         </p>
       </div>

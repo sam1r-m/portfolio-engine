@@ -88,10 +88,10 @@ export default function DashboardPage() {
             <ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />
           </Link>
           <div>
-            <h1 className="text-sm font-semibold tracking-tight">
+            <h1 className="text-base font-bold tracking-tight">
               Portfolio Engine
             </h1>
-            <p className="num mt-0.5 text-[11px] text-ink-3">
+            <p className="ui mt-0.5 text-[11px] text-ink-3">
               {fileName ?? "holdings"}
               {snapshotDate ? ` · export as of ${fullDate(snapshotDate)}` : ""}
             </p>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
               clear();
               router.push("/");
             }}
-            className="num border border-rule bg-panel px-2.5 py-1.5 text-[11px] font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
+            className="ui border border-rule bg-panel px-2.5 py-1.5 text-[11px] font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
           >
             Replace csv
           </button>
@@ -126,10 +126,7 @@ export default function DashboardPage() {
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
         <Panel title="Market value" meta="CAD">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
-            <p
-              className="text-[clamp(2.75rem,7vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.045em]"
-              style={{ fontVariantNumeric: "proportional-nums" }}
-            >
+            <p className="readout text-[clamp(2.75rem,7vw,4.75rem)] leading-[0.92]">
               {money(totals.valueCad)}
             </p>
             <div className="pb-1.5">
@@ -201,20 +198,20 @@ export default function DashboardPage() {
                 showBenchmark={showBenchmark}
                 dimmed={history.status === "loading"}
               />
-              <p className="mt-4 border-t border-rule pt-3 text-xs leading-relaxed text-ink-2">
-                Today&rsquo;s share counts priced at historical closes, converted
-                at the rate on each day. The export carries no transactions, so
-                this is what the current basket would have been worth — not what
-                the account did.
+              <p className="mt-4 border-t border-rule pt-3 text-[13px] leading-relaxed text-ink-2">
+                Your share counts today, priced at each day&rsquo;s close and
+                converted at that day&rsquo;s rate. The export has no
+                transactions in it, so this is what the basket you hold now
+                would have been worth, not what the account actually did.
                 {series.missing.length > 0
-                  ? ` ${series.missing.length} ${series.missing.length === 1 ? "holding has" : "holdings have"} no price history and sit outside the line.`
+                  ? ` ${series.missing.length} ${series.missing.length === 1 ? "holding has" : "holdings have"} no price history, so ${series.missing.length === 1 ? "it sits" : "they sit"} outside the line.`
                   : ""}
               </p>
             </>
           ) : (
             <p className="py-16 text-center text-sm text-ink-2">
               {history.status === "error"
-                ? "Price history could not be loaded."
+                ? "Price history did not load."
                 : "Loading price history…"}
             </p>
           )}

@@ -37,7 +37,7 @@ export function Segmented<T extends string>({
             aria-checked={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "num px-2.5 py-1.5 text-[11px] font-medium tracking-wide transition-colors",
+              "ui px-2.5 py-1.5 text-[11px] font-medium tracking-wide transition-colors",
               i > 0 && "border-l border-rule",
               active
                 ? "bg-accent text-white"
@@ -84,7 +84,7 @@ export function Toggle({
           )}
         />
       </span>
-      <span className="num font-medium tracking-wide">{children}</span>
+      <span className="ui font-medium tracking-wide">{children}</span>
     </button>
   );
 }
@@ -105,7 +105,7 @@ export function Delta({
   hidePercentOnSmall?: boolean;
 }) {
   if (percent === null) {
-    return <span className="num text-ink-3">—</span>;
+    return <span className="num text-ink-3">&mdash;</span>;
   }
   const up = (value ?? percent) >= 0;
   const flat = (value ?? percent) === 0;

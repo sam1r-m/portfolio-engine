@@ -100,12 +100,12 @@ export function BasketChart({
     <div ref={ref} className="w-full">
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <div className="flex items-baseline gap-3">
-          <span className="num text-2xl font-medium tabular-nums">
+          <span className="readout text-[1.75rem] leading-none">
             {money(activeValue)}
           </span>
           <span
             className={cn(
-              "num text-xs font-medium tabular-nums",
+              "num text-xs font-semibold tabular-nums",
               activeChange >= 0 ? "text-pos" : "text-neg",
             )}
           >
@@ -321,7 +321,7 @@ function Readout({
       }}
     >
       <p className="label">{fullDate(series.dates[index])}</p>
-      <p className="num mt-1.5 text-sm font-medium tabular-nums">
+      <p className="num mt-1.5 text-sm font-semibold tabular-nums">
         {money(series.values[index])}
       </p>
       <p

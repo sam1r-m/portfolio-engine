@@ -140,7 +140,7 @@ export function HoldingsTable({ positions }: { positions: Position[] }) {
               >
                 <td className="w-full px-3 py-2.5 sm:px-5">
                   <div className="flex items-baseline gap-2">
-                    <span className="num text-sm font-medium">{p.symbol}</span>
+                    <span className="num text-sm font-semibold">{p.symbol}</span>
                     {!p.livePrice ? (
                       <span
                         className="label text-[9px] text-ink-3"

@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 const TICKS = Array.from({ length: 21 }, (_, i) => i);
 
 /**
- * Market value measured against book value on one scale: ink to whatever was
- * paid, then the gain or the shortfall as a span you can read the length of.
+ * Market value measured against book value on one scale. Ink runs to whatever
+ * was paid, then the gain or shortfall is a span you can read the length of.
  */
 export function ValueScale({
   marketValue,

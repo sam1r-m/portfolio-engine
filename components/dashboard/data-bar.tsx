@@ -8,7 +8,7 @@ import { USD_CAD_FALLBACK } from "@/lib/portfolio/positions";
 import type { FetchStatus } from "@/lib/portfolio/use-market-data";
 import { cn } from "@/lib/utils";
 
-/** Provenance strip: what is measured, what is reconstructed, and from when. */
+/** Where the numbers came from, and how fresh they are. */
 export function DataBar({
   positions,
   usdCad,
@@ -35,7 +35,7 @@ export function DataBar({
         tone={quoteStatus === "error" ? "warn" : undefined}
         value={
           quoteStatus === "error"
-            ? "unavailable — showing export values"
+            ? "not reachable, using export values"
             : loading
               ? "fetching…"
               : asOf

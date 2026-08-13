@@ -2,8 +2,9 @@
 @import "shadcn/tailwind.css";
 
 /*
-  Instrument: white panels on drafting-paper ground, hairline rules, one
-  ultramarine. Committed light — the thing gets read at a desk in daylight.
+  Instrument: white panels on ruled ground, hairline rules, one ultramarine.
+  Libre Caslon carries the voice, Montserrat handles labels and figures.
+  Committed light, because this gets read at a desk in daylight.
 */
 :root {
   --ground: #eaeae8;
@@ -48,8 +49,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-archivo);
-  --font-mono: var(--font-azeret);
+  --font-serif: var(--font-caslon);
+  --font-sans: var(--font-montserrat);
   --color-ground: var(--ground);
   --color-panel: var(--panel);
   --color-panel-sunk: var(--panel-sunk);
@@ -86,12 +87,13 @@
     min-width: 0;
   }
 
+  /* Serif leads. Sans is for labels, controls and figures. */
   html {
-    font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-caslon), ui-serif, Georgia, serif;
     -webkit-text-size-adjust: 100%;
   }
 
-  /* Ledger ruling on the type rhythm — the paper this gets read on. */
+  /* Ledger ruling on the type rhythm, the paper this gets read on. */
   body {
     background-color: var(--ground);
     background-image: repeating-linear-gradient(
@@ -121,19 +123,32 @@
 }
 
 @utility label {
-  font-family: var(--font-azeret), ui-monospace, monospace;
+  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
+/* Figures that sit in columns and have to line up. */
 @utility num {
-  font-family: var(--font-azeret), ui-monospace, monospace;
+  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "zero" 1;
+}
+
+/* Controls, meta lines, anything the serif would make fussy at small sizes. */
+@utility ui {
+  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Display figures. Caslon's own lining numerals, spaced to read as a headline. */
+@utility readout {
+  font-family: var(--font-caslon), ui-serif, Georgia, serif;
+  font-variant-numeric: proportional-nums;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* Marks a bucket the data could not classify, so a gap never reads as a value. */
