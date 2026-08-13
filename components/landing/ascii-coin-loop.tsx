@@ -16,7 +16,7 @@ const PLAYBACK_SPEED = 1.3;
 
 /**
  * The export pads every frame out to a fixed canvas, so a third of the box is
- * blank. Crop to the tightest window that holds the art in any frame — the
+ * blank. Crop to the tightest window that holds the art in any frame, the
  * same crop for all of them, or the coin would jitter.
  */
 const frames: string[] = (() => {
@@ -64,7 +64,7 @@ function reducedMotionServerSnapshot() {
   return false;
 }
 
-/** Frames come out of ascii-mation; the wrapper scales them to fit the column. */
+/** Frames come out of ascii-mation. The wrapper scales them to fit the column. */
 export function AsciiCoinLoop({ className }: { className?: string }) {
   const wrapRef = useRef<HTMLAnchorElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -92,12 +92,14 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     const ph = pre.offsetHeight;
     if (pw < 1 || ph < 1) return;
 
-    // Bound by height as well as width; the frames are taller than they
-    // are wide, so fitting the column alone runs the coin off the fold.
+    // Bound by height as well as width. The frames are taller than they are
+    // wide, so fitting the column alone runs the coin off the fold.
     const narrow = isNarrowViewport();
-    const s = Math.min(cw / pw, (narrow ? 340 : 620) / ph, narrow ? 1.35 : 2.4);
+    const s = Math.min(cw / pw, (narrow ? 260 : 380) / ph, narrow ? 1.35 : 2.4);
     inner.style.transform = `scale(${s})`;
     inner.style.transformOrigin = "top left";
+    // Scaling from the corner leaves the art hard left, so recentre by hand.
+    inner.style.marginLeft = `${Math.max((cw - pw * s) / 2, 0)}px`;
 
     const nextH = Math.ceil(ph * s);
     setBoxH((prev) => (prev === nextH ? prev : nextH));

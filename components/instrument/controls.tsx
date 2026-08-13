@@ -105,7 +105,7 @@ export function Delta({
   hidePercentOnSmall?: boolean;
 }) {
   if (percent === null) {
-    return <span className="num text-ink-3">&mdash;</span>;
+    return <span className="num text-ink-3">–</span>;
   }
   const up = (value ?? percent) >= 0;
   const flat = (value ?? percent) === 0;

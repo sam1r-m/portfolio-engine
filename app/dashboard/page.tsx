@@ -87,15 +87,10 @@ export default function DashboardPage() {
           >
             <ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />
           </Link>
-          <div>
-            <h1 className="text-base font-bold tracking-tight">
-              Portfolio Engine
-            </h1>
-            <p className="ui mt-0.5 text-[11px] text-ink-3">
-              {fileName ?? "holdings"}
-              {snapshotDate ? ` · export as of ${fullDate(snapshotDate)}` : ""}
-            </p>
-          </div>
+          <h1 className="ui text-xs text-ink-2">
+            {fileName ?? "holdings"}
+            {snapshotDate ? ` · ${fullDate(snapshotDate)}` : ""}
+          </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <AccountFilter rows={holdings} value={account} onChange={setAccount} />
@@ -151,15 +146,14 @@ export default function DashboardPage() {
             <Field label="Positions" value={totals.positions} />
             <Field label="Securities" value={totals.securities} />
             <Field
-              label="Top 5 weight"
+              label="Top 5"
               value={percent(concentration(positions, 5), 0)}
-              hint="of market value"
             />
             <Field
               label="Largest"
               value={
                 [...positions].sort((a, b) => b.valueCad - a.valueCad)[0]
-                  ?.symbol ?? "—"
+                  ?.symbol ?? "n/a"
               }
               hint={percent(concentration(positions, 1), 1)}
             />
@@ -199,12 +193,10 @@ export default function DashboardPage() {
                 dimmed={history.status === "loading"}
               />
               <p className="mt-4 border-t border-rule pt-3 text-[13px] leading-relaxed text-ink-2">
-                Your share counts today, priced at each day&rsquo;s close and
-                converted at that day&rsquo;s rate. The export has no
-                transactions in it, so this is what the basket you hold now
-                would have been worth, not what the account actually did.
+                What today&rsquo;s share counts were worth on each past day. The
+                export has no transactions, so this is not what the account did.
                 {series.missing.length > 0
-                  ? ` ${series.missing.length} ${series.missing.length === 1 ? "holding has" : "holdings have"} no price history, so ${series.missing.length === 1 ? "it sits" : "they sit"} outside the line.`
+                  ? ` ${series.missing.length} without price history.`
                   : ""}
               </p>
             </>

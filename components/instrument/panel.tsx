@@ -1,25 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** Registration marks at the corners, so the panel reads as a measured plate. */
-function CornerTicks() {
-  return (
-    <span aria-hidden className="pointer-events-none absolute inset-0">
-      {[
-        "left-0 top-0 border-l border-t",
-        "right-0 top-0 border-r border-t",
-        "left-0 bottom-0 border-l border-b",
-        "right-0 bottom-0 border-r border-b",
-      ].map((pos) => (
-        <span
-          key={pos}
-          className={cn("absolute size-2 border-ink/45", pos)}
-        />
-      ))}
-    </span>
-  );
-}
-
 export function Panel({
   title,
   meta,
@@ -39,8 +20,7 @@ export function Panel({
   flush?: boolean;
 }) {
   return (
-    <section className={cn("relative border border-rule bg-panel", className)}>
-      <CornerTicks />
+    <section className={cn("border border-rule bg-panel", className)}>
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-4 py-3 sm:px-5">
           <div className="flex items-baseline gap-3">
@@ -54,7 +34,9 @@ export function Panel({
           ) : null}
         </header>
       )}
-      <div className={cn(flush ? "" : "px-4 py-4 sm:px-5 sm:py-5", bodyClassName)}>
+      <div
+        className={cn(flush ? "" : "px-4 py-4 sm:px-5 sm:py-5", bodyClassName)}
+      >
         {children}
       </div>
     </section>

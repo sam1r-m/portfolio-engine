@@ -47,6 +47,6 @@ export function exchangeLabel(mic: string): string {
     case "AEQL":
       return "Cboe Canada";
     default:
-      return mic || "—";
+      return mic || "–";
   }
 }

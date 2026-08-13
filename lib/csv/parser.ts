@@ -61,7 +61,7 @@ export function parseHoldingsCsv(text: string): ParsedHoldings {
   for (const header of HOLDINGS_HEADERS) {
     if (!fields.includes(header)) {
       throw new CsvFormatError(
-        `Missing expected column "${header}". Is this really a Wealthsimple Holdings Report?`,
+        `Missing the "${header}" column. This does not look like a Wealthsimple holdings report.`,
       );
     }
   }
@@ -74,12 +74,12 @@ export function parseHoldingsCsv(text: string): ParsedHoldings {
       const issue = parsed.error.issues[0];
       // +2: header is line 1, array is 0-indexed
       throw new CsvFormatError(
-        `Row ${i + 2}: ${issue?.path.join(".") ?? "row"} — ${issue?.message ?? "invalid"}`,
+        `Row ${i + 2}, ${issue?.path.join(".") ?? "row"}: ${issue?.message ?? "invalid"}`,
       );
     }
     if (parsed.data["Position Direction"] === "SHORT") {
       throw new CsvFormatError(
-        `Row ${i + 2}: ${parsed.data["Symbol"]} is a SHORT position. ` +
+        `Row ${i + 2}: ${parsed.data["Symbol"]} is a short position. ` +
           `The math here assumes long only.`,
       );
     }

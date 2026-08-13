@@ -36,6 +36,6 @@ describe("parseHoldingsCsv", () => {
 
   it("rejects SHORT positions with a clear error", () => {
     const withShort = FIXTURE.replace(/"LONG"/, '"SHORT"');
-    expect(() => parseHoldingsCsv(withShort)).toThrow(/SHORT position/);
+    expect(() => parseHoldingsCsv(withShort)).toThrow(/short position/i);
   });
 });

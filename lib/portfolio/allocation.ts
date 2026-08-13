@@ -15,7 +15,7 @@ export interface Dimension {
   label: string;
   /** ETF sector weights can dissolve a fund across this dimension. */
   supportsLookthrough: boolean;
-  /** Ordered scales keep their own order; everything else sorts by value. */
+  /** Ordered scales keep their own order. Everything else sorts by value. */
   scale?: readonly string[];
 }
 
@@ -69,7 +69,7 @@ function bucketKey(p: Position, dimension: DimensionId): string {
 
 /**
  * Splits one position across buckets. A fund with published sector weights is
- * dissolved into them; everything else lands whole in a single bucket.
+ * dissolved into them. Everything else lands whole in a single bucket.
  */
 function splitPosition(
   p: Position,
@@ -146,7 +146,7 @@ export function allocate(
 
   const scale = DIMENSIONS.find((d) => d.id === dimension)?.scale;
 
-  // Unclassified always sinks to the bottom; it is a gap, not a holding.
+  // Unclassified always sinks to the bottom. It is a gap, not a holding.
   return out.sort((a, b) => {
     if (a.label === UNCLASSIFIED) return 1;
     if (b.label === UNCLASSIFIED) return -1;

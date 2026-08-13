@@ -17,15 +17,10 @@ export function ContinueToDashboard() {
       href="/dashboard"
       className="group flex items-center justify-between gap-4 border border-ink bg-panel px-4 py-3 transition-colors hover:bg-ink hover:text-white"
     >
-      <span className="min-w-0">
-        <span className="label block group-hover:text-white/70">
-          Already loaded
-        </span>
-        <span className="ui mt-1 block truncate text-xs">
-          {fileName ?? "holdings"} · {holdings.length} positions
-        </span>
+      <span className="ui min-w-0 truncate text-xs">
+        {fileName ?? "holdings"} · {holdings.length} positions
       </span>
-      <span className="ui flex shrink-0 items-center gap-1.5 text-xs font-medium">
+      <span className="ui flex shrink-0 items-center gap-1.5 text-xs">
         Open
         <ArrowRight aria-hidden className="size-3.5" strokeWidth={2} />
       </span>

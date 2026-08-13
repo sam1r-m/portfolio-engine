@@ -55,10 +55,9 @@ export function AllocationPanel({ positions }: { positions: Position[] }) {
           <Toggle checked={lookthrough} onChange={setLookthrough}>
             Look through funds
           </Toggle>
-          <p className="text-xs text-ink-2">
-            {lookthrough
-              ? `${fundsWithWeights} fund ${fundsWithWeights === 1 ? "position is" : "positions are"} split by the sectors they hold.`
-              : `${fundsWithWeights} fund ${fundsWithWeights === 1 ? "position counts" : "positions count"} as one line each.`}
+          <p className="ui text-[11px] text-ink-3">
+            {fundsWithWeights} fund {fundsWithWeights === 1 ? "position" : "positions"}
+            {lookthrough ? " split by sector" : " kept whole"}
           </p>
         </div>
       ) : null}

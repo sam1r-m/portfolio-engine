@@ -2,9 +2,9 @@
 @import "shadcn/tailwind.css";
 
 /*
-  Instrument: white panels on ruled ground, hairline rules, one ultramarine.
-  Libre Caslon carries the voice, Montserrat handles labels and figures.
-  Committed light, because this gets read at a desk in daylight.
+  White panels on ruled ground, hairline rules, one ultramarine.
+  Libre Caslon for words, Azeret Mono for anything measured.
+  Light only, because this gets read at a desk in daylight.
 */
 :root {
   --ground: #eaeae8;
@@ -50,7 +50,7 @@
 
 @theme inline {
   --font-serif: var(--font-caslon);
-  --font-sans: var(--font-montserrat);
+  --font-mono: var(--font-azeret);
   --color-ground: var(--ground);
   --color-panel: var(--panel);
   --color-panel-sunk: var(--panel-sunk);
@@ -123,32 +123,31 @@
 }
 
 @utility label {
-  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-azeret), ui-monospace, monospace;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
-/* Figures that sit in columns and have to line up. */
+/* Anything measured. */
 @utility num {
-  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-azeret), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
 }
 
-/* Controls, meta lines, anything the serif would make fussy at small sizes. */
+/* Controls and meta lines, where the serif turns fussy at small sizes. */
 @utility ui {
-  font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-azeret), ui-monospace, monospace;
 }
 
-/* Display figures. Caslon's own lining numerals, spaced to read as a headline. */
 @utility readout {
-  font-family: var(--font-caslon), ui-serif, Georgia, serif;
-  font-variant-numeric: proportional-nums;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--font-azeret), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
 
 /* Marks a bucket the data could not classify, so a gap never reads as a value. */
