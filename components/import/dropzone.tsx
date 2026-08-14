@@ -1,35 +1,36 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import { useLoadHoldings } from "@/components/import/use-load-holdings";
 import { cn } from "@/lib/utils";
 
-export function Dropzone() {
+export function Dropzone({ footer }: { footer?: ReactNode }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const { loadFromFile, error, loading } = useLoadHoldings();
 
   return (
-    <div>
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={async (e) => {
-          e.preventDefault();
-          setDragging(false);
-          const file = e.dataTransfer.files?.[0];
-          if (file) await loadFromFile(file);
-        }}
-        className={cn(
-          "flex flex-col items-center justify-center gap-5 border px-6 py-12 text-center transition-colors duration-200",
-          dragging
-            ? "border-accent bg-accent-wash"
-            : "border-rule bg-panel hover:border-rule-strong",
-        )}
-      >
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragging(true);
+      }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={async (e) => {
+        e.preventDefault();
+        setDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) await loadFromFile(file);
+      }}
+      className={cn(
+        "border transition-colors duration-200",
+        dragging
+          ? "border-accent bg-accent-wash"
+          : "border-rule bg-panel hover:border-rule-strong",
+      )}
+    >
+      <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
         <p className="text-xl">
           {loading ? "Reading…" : "Drop your holdings csv"}
         </p>
@@ -53,10 +54,16 @@ export function Dropzone() {
         >
           Choose file
         </button>
+
+        {error ? (
+          <p className="ui max-w-md text-xs leading-relaxed text-neg">{error}</p>
+        ) : null}
       </div>
 
-      {error ? (
-        <p className="ui mt-3 text-xs leading-relaxed text-neg">{error}</p>
+      {footer ? (
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-rule px-4 py-3 sm:px-5">
+          {footer}
+        </div>
       ) : null}
     </div>
   );

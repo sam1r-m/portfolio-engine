@@ -16,8 +16,9 @@ const PLAYBACK_SPEED = 1.3;
 
 /**
  * The export pads every frame out to a fixed canvas, so a third of the box is
- * blank. Crop to the tightest window that holds the art in any frame, the
- * same crop for all of them, or the coin would jitter.
+ * blank. Crop to the tightest window that holds the art in any frame, then pad
+ * every line back out to that exact width. Ragged lines would make the <pre>
+ * resize frame to frame, which is what made the coin wander.
  */
 const frames: string[] = (() => {
   const all: string[][] = rawFrames.map((f: string) => f.split("\n"));
@@ -38,17 +39,49 @@ const frames: string[] = (() => {
   }
   if (!Number.isFinite(left) || !Number.isFinite(top)) return rawFrames;
 
+  const width = right - left;
   return all.map((lines) =>
     lines
       .slice(top, bottom + 1)
-      .map((line) => line.slice(left, right).trimEnd())
+      .map((line) => line.slice(left, right).padEnd(width, " "))
       .join("\n"),
   );
 })();
 
-const isNarrowViewport = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(max-width: 1023px)").matches;
+/**
+ * Half-resolution frames for small renders. Below roughly 5px a row, the glyphs
+ * collapse into stripes, so drop every other row and column and let each
+ * remaining character be twice the size. Same shape, still readable.
+ */
+const halfFrames: string[] = frames.map((frame) =>
+  frame
+    .split("\n")
+    .filter((_, row) => row % 2 === 0)
+    .map((line) =>
+      line
+        .split("")
+        .filter((_, col) => col % 2 === 0)
+        .join(""),
+    )
+    .join("\n"),
+);
+
+const ROWS = frames[0]?.split("\n").length ?? 1;
+/** Below this many pixels per row, characters stop resolving. */
+const LEGIBLE_ROW_PX = 5;
+
+function subscribeNarrow(onStoreChange: () => void) {
+  const mq = window.matchMedia("(max-width: 1023px)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+const useNarrow = () =>
+  useSyncExternalStore(
+    subscribeNarrow,
+    () => window.matchMedia("(max-width: 1023px)").matches,
+    () => false,
+  );
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -65,7 +98,15 @@ function reducedMotionServerSnapshot() {
 }
 
 /** Frames come out of ascii-mation. The wrapper scales them to fit the column. */
-export function AsciiCoinLoop({ className }: { className?: string }) {
+export function AsciiCoinLoop({
+  className,
+  maxHeight = 380,
+  narrowMaxHeight = 260,
+}: {
+  className?: string;
+  maxHeight?: number;
+  narrowMaxHeight?: number;
+}) {
   const wrapRef = useRef<HTMLAnchorElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
@@ -76,11 +117,14 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     reducedMotionServerSnapshot,
   );
 
+  const cap = useNarrow() ? narrowMaxHeight : maxHeight;
+  const source = cap / ROWS < LEGIBLE_ROW_PX ? halfFrames : frames;
+
   const applyScale = useCallback(() => {
     const wrap = wrapRef.current;
     const inner = innerRef.current;
     const pre = preRef.current;
-    if (!wrap || !inner || !pre || !frames.length) return;
+    if (!wrap || !inner || !pre) return;
 
     const cs = getComputedStyle(wrap);
     const padX =
@@ -92,50 +136,48 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     const ph = pre.offsetHeight;
     if (pw < 1 || ph < 1) return;
 
-    // Bound by height as well as width. The frames are taller than they are
-    // wide, so fitting the column alone runs the coin off the fold.
-    const narrow = isNarrowViewport();
-    const s = Math.min(cw / pw, (narrow ? 260 : 380) / ph, narrow ? 1.35 : 2.4);
+    const s = Math.min(cw / pw, cap / ph);
     inner.style.transform = `scale(${s})`;
     inner.style.transformOrigin = "top left";
-    // Scaling from the corner leaves the art hard left, so recentre by hand.
+    // Scaling from the corner pins the art left, so recentre it by hand.
     inner.style.marginLeft = `${Math.max((cw - pw * s) / 2, 0)}px`;
 
     const nextH = Math.ceil(ph * s);
     setBoxH((prev) => (prev === nextH ? prev : nextH));
-  }, []);
+  }, [cap]);
 
   useLayoutEffect(() => {
     const pre = preRef.current;
-    if (pre && frames.length) pre.textContent = frames[0];
+    if (pre && source.length) pre.textContent = source[0];
     applyScale();
     const id = requestAnimationFrame(() => applyScale());
     return () => cancelAnimationFrame(id);
-  }, [applyScale]);
+  }, [applyScale, source]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
     const ro = new ResizeObserver(() => applyScale());
     ro.observe(wrap);
-    return () => ro.disconnect();
+    // The first measure lands on the fallback face, whose metrics differ from
+    // the real one, so scale again once the webfont is actually in.
+    let cancelled = false;
+    void document.fonts?.ready.then(() => {
+      if (!cancelled) applyScale();
+    });
+    return () => {
+      cancelled = true;
+      ro.disconnect();
+    };
   }, [applyScale]);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const onChange = () => applyScale();
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [applyScale]);
-
-  useEffect(() => {
-    if (!frames.length) return;
+    if (!source.length) return;
     const pre = preRef.current;
     if (!pre) return;
 
     if (prefersReducedMotion) {
-      pre.textContent = frames[0];
-      requestAnimationFrame(applyScale);
+      pre.textContent = source[0];
       return;
     }
 
@@ -145,18 +187,17 @@ export function AsciiCoinLoop({ className }: { className?: string }) {
     let id: number;
 
     const tick = (now: number) => {
-      const i = Math.floor((now - start) / frameMs) % frames.length;
+      const i = Math.floor((now - start) / frameMs) % source.length;
       if (i !== lastIndex) {
         lastIndex = i;
-        pre.textContent = frames[i];
-        requestAnimationFrame(applyScale);
+        pre.textContent = source[i];
       }
       id = requestAnimationFrame(tick);
     };
 
     id = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(id);
-  }, [applyScale, prefersReducedMotion]);
+  }, [prefersReducedMotion, source]);
 
   return (
     <a
