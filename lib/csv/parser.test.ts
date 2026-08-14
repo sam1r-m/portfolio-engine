@@ -34,8 +34,13 @@ describe("parseHoldingsCsv", () => {
     expect(() => parseHoldingsCsv(broken.join("\n"))).toThrow(CsvFormatError);
   });
 
-  it("rejects SHORT positions with a clear error", () => {
+  it("drops SHORT positions instead of failing the file", () => {
+    const { rows: all } = parseHoldingsCsv(FIXTURE);
     const withShort = FIXTURE.replace(/"LONG"/, '"SHORT"');
-    expect(() => parseHoldingsCsv(withShort)).toThrow(/short position/i);
+    const { rows } = parseHoldingsCsv(withShort);
+
+    expect(rows.length).toBe(all.length - 1);
+    expect(rows.every((r) => r.positionDirection === "LONG")).toBe(true);
+    expect(rows.map((r) => r.symbol)).not.toContain(all[0].symbol);
   });
 });

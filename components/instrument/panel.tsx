@@ -20,7 +20,7 @@ export function Panel({
   flush?: boolean;
 }) {
   return (
-    <section className={cn("border border-rule bg-panel", className)}>
+    <section className={cn("rounded-lg border border-rule bg-panel", className)}>
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-4 py-3 sm:px-5">
           <div className="flex items-baseline gap-3">

@@ -314,7 +314,7 @@ function Readout({
 
   return (
     <div
-      className="pointer-events-none absolute top-3 z-10 border border-rule bg-panel px-3 py-2 shadow-[0_2px_10px_-4px_rgb(16_16_16/0.35)]"
+      className="pointer-events-none absolute top-3 z-10 rounded-md border border-rule bg-panel px-3 py-2 shadow-[0_2px_10px_-4px_rgb(16_16_16/0.35)]"
       style={{
         left: `${(left / containerWidth) * 100}%`,
         transform: flip ? "translateX(calc(-100% - 12px))" : "translateX(12px)",

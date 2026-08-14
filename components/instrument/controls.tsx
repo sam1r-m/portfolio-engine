@@ -23,7 +23,7 @@ export function Segmented<T extends string>({
       role="radiogroup"
       aria-label={label}
       className={cn(
-        "flex flex-wrap items-stretch border border-rule bg-panel",
+        "flex flex-wrap items-stretch overflow-hidden rounded-md border border-rule bg-panel",
         className,
       )}
     >
@@ -67,17 +67,17 @@ export function Toggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="group flex items-center gap-2 border border-rule bg-panel px-2.5 py-1.5 text-[11px] text-ink-2 transition-colors hover:bg-panel-sunk hover:text-ink"
+      className="group flex items-center gap-2 rounded-md border border-rule bg-panel px-2.5 py-1.5 text-[11px] text-ink-2 transition-colors hover:bg-panel-sunk hover:text-ink"
     >
       <span
         className={cn(
-          "relative block h-3 w-6 border transition-colors",
+          "relative block h-3 w-6 rounded-full border transition-colors",
           checked ? "border-accent bg-accent" : "border-rule-strong bg-panel",
         )}
       >
         <span
           className={cn(
-            "absolute top-px block size-[10px] transition-transform",
+            "absolute top-px block size-[10px] rounded-full transition-transform",
             checked
               ? "translate-x-[13px] bg-white"
               : "translate-x-px bg-rule-strong",

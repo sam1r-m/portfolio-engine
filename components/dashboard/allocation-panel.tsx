@@ -62,7 +62,7 @@ export function AllocationPanel({ positions }: { positions: Position[] }) {
         </div>
       ) : null}
 
-      <ul>
+      <ul className="overflow-hidden rounded-b-lg">
         {buckets.map((bucket) => (
           <Row
             key={bucket.label}

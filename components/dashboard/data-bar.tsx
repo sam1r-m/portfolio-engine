@@ -29,7 +29,7 @@ export function DataBar({
   const loading = quoteStatus === "loading" || profileStatus === "loading";
 
   return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border border-rule bg-panel px-4 py-2 sm:px-5">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg border border-rule bg-panel px-4 py-2 sm:px-5">
       <Cell
         label="Prices"
         tone={quoteStatus === "error" ? "warn" : undefined}

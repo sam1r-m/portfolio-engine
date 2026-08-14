@@ -15,7 +15,7 @@ export function ContinueToDashboard() {
   return (
     <Link
       href="/dashboard"
-      className="group flex items-center justify-between gap-4 border border-ink bg-panel px-4 py-3 transition-colors hover:bg-ink hover:text-white"
+      className="group flex items-center justify-between gap-4 rounded-lg border border-ink bg-panel px-4 py-3 transition-colors hover:bg-ink hover:text-white"
     >
       <span className="ui min-w-0 truncate text-xs">
         {fileName ?? "holdings"} · {holdings.length} positions

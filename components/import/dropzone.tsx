@@ -24,7 +24,7 @@ export function Dropzone({ footer }: { footer?: ReactNode }) {
         if (file) await loadFromFile(file);
       }}
       className={cn(
-        "border transition-colors duration-200",
+        "rounded-lg border transition-colors duration-200",
         dragging
           ? "border-accent bg-accent-wash"
           : "border-rule bg-panel hover:border-rule-strong",
@@ -32,7 +32,7 @@ export function Dropzone({ footer }: { footer?: ReactNode }) {
     >
       <div className="flex flex-col items-center gap-4 px-6 py-10 text-center">
         <p className="text-xl">
-          {loading ? "Reading…" : "Drop your holdings csv"}
+          {loading ? "Reading…" : "Upload holdings csv"}
         </p>
 
         <input
@@ -50,7 +50,7 @@ export function Dropzone({ footer }: { footer?: ReactNode }) {
           type="button"
           disabled={loading}
           onClick={() => inputRef.current?.click()}
-          className="ui border border-ink bg-ink px-4 py-2 text-xs tracking-wide text-white transition-colors hover:border-accent hover:bg-accent disabled:opacity-50"
+          className="ui rounded-md border border-ink bg-ink px-4 py-2 text-xs tracking-wide text-white transition-colors hover:border-accent hover:bg-accent disabled:opacity-50"
         >
           Choose file
         </button>
@@ -61,7 +61,7 @@ export function Dropzone({ footer }: { footer?: ReactNode }) {
       </div>
 
       {footer ? (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-rule px-4 py-3 sm:px-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-b-lg border-t border-rule px-4 py-3 sm:px-5">
           {footer}
         </div>
       ) : null}

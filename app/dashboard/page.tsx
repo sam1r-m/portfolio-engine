@@ -83,7 +83,7 @@ export default function DashboardPage() {
           <Link
             href="/"
             aria-label="Back to import"
-            className="flex size-8 items-center justify-center border border-rule bg-panel text-ink-2 transition-colors hover:border-ink hover:text-ink"
+            className="flex size-8 items-center justify-center rounded-md border border-rule bg-panel text-ink-2 transition-colors hover:border-ink hover:text-ink"
           >
             <ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />
           </Link>
@@ -100,7 +100,7 @@ export default function DashboardPage() {
               clear();
               router.push("/");
             }}
-            className="ui border border-rule bg-panel px-2.5 py-1.5 text-[11px] font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
+            className="ui rounded-md border border-rule bg-panel px-2.5 py-1.5 text-[11px] font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
           >
             Replace csv
           </button>

@@ -77,12 +77,9 @@ export function parseHoldingsCsv(text: string): ParsedHoldings {
         `Row ${i + 2}, ${issue?.path.join(".") ?? "row"}: ${issue?.message ?? "invalid"}`,
       );
     }
-    if (parsed.data["Position Direction"] === "SHORT") {
-      throw new CsvFormatError(
-        `Row ${i + 2}: ${parsed.data["Symbol"]} is a short position. ` +
-          `The math here assumes long only.`,
-      );
-    }
+    // Everything downstream assumes long only, so shorts are dropped rather
+    // than rejected. A file with one is still a usable file.
+    if (parsed.data["Position Direction"] === "SHORT") continue;
     rows.push(toHoldingRow(parsed.data));
   }
   return { rows, snapshotDate };
